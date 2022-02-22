@@ -18,9 +18,14 @@ function recall(decisions, true_decisions)
 end
 
 
+function get_true_decisions(results::Dict; extraction_cost=150)
+    return map(r_massive->r_massive > extraction_cost ? :mine : :abandon, results[:r_massive])
+end
+
+
 function accuracy(results::Dict; extraction_cost=150)
     decisions = results[:last_action]
-    true_decisions = map(r_massive->r_massive > extraction_cost ? :mine : :abandon, results[:r_massive])
+    true_decisions = get_true_decisions(results; extraction_cost=extraction_cost)
     return accuracy(decisions, true_decisions)
 end
 

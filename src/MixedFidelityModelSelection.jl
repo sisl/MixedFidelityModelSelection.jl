@@ -32,6 +32,7 @@ export
     recall,
     accuracy,
     confusion_matrix,
+    get_true_decisions,
     plot_confusion
 include("confusion.jl")
 

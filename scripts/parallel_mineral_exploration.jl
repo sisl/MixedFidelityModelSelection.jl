@@ -172,7 +172,7 @@ using Distributed
 
         Random.seed!(trial.config.seed)
         timing = @timed begin
-            trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false)
+            trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false, verbose=false)
         end
 
         results = MEResults(config=trial.config,
@@ -255,7 +255,7 @@ function makebatches(configs::Vector{<:Configuration}, n)
 end
 
 
-function kickoff(configuration_fn::Function, nbatches)
+function kickoff(configuration_fn::Function, nbatches; results_dir=abspath("results"))
     configs = configuration_fn()
     batches = makebatches(configs, nbatches)
 
@@ -265,10 +265,10 @@ function kickoff(configuration_fn::Function, nbatches)
     @info "Number of processes: $(nprocs())"
     @time pmap(batch->begin
                for config in batch
-                   job(config)
+                   job(config; results_dir=results_dir)
                end
            end, batches)
-    # TODO: reduce results (either with an array of Results, or using the files)
+    reduce_results(configuration_fn; results_dir=results_dir)
 end
 
 
