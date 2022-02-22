@@ -12,6 +12,7 @@ using Distributed
 @everywhere using MixedFidelityModelSelection
 @everywhere using ProgressMeter
 @everywhere using BSON
+@everywhere import BSON: @save
 
 @everywhere begin
     @with_kw struct MEJobParameters <: JobParameters
