@@ -18,3 +18,31 @@ function sample_massive(m,
     end
     return samples, seeds
 end
+
+
+function filltomatch!(A::Vector{Vector{T}}) where T <: Any
+    max_length = maximum(map(length, A))    
+    for i in 1:length(A)
+        len = length(A[i])
+        if len < max_length
+            # fill last element to `max_length`
+            A[i] = vcat(A[i], fill(A[i][end], max_length-len))
+        end
+    end
+    return A
+end
+
+
+function mismatch_mean(A)
+    max_length = maximum(map(length, A))
+    Z = [map(a->i <= length(a) ? a[i] : nothing, A) for i in 1:max_length]
+    return map(mean, map(z->filter(!isnothing, z), Z))
+end
+
+
+function mismatch_std(A)
+    max_length = maximum(map(length, A))
+    Z = [map(a->i <= length(a) ? a[i] : nothing, A) for i in 1:max_length]
+    stds = map(std, map(z->filter(!isnothing, z), Z))
+    return map(σ->isnan(σ) ? 0 : σ, stds)
+end

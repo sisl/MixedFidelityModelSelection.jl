@@ -190,6 +190,9 @@ end
 # ╔═╡ 2ea1631f-47ef-49c0-92c7-9ee9d09501d8
 @bind high_fidelity CheckBox(true)
 
+# ╔═╡ dc115277-7458-413a-9e2e-a166cbca069e
+
+
 # ╔═╡ 4cbaf630-1793-4250-a3ef-e6a59d33d8df
 md"""
 # Normal samples of ore mass
@@ -200,6 +203,9 @@ md"""
 ---
 """
 
+# ╔═╡ 836c9078-5899-439b-b62c-9bb14fe187ea
+xydim = 10
+
 # ╔═╡ 7597e5aa-3fce-484f-8667-1356d086b6a5
 begin
 	m = MineralExplorationPOMDP(max_bores=MAX_BORES, delta=GRID_SPACING+1,
@@ -207,7 +213,7 @@ begin
 	                            true_mainbody_gen=true_mainbody,
 		                        mainbody_gen=mainbody,
 		                        original_max_movement=MAX_MOVEMENT,
-	                            min_bores=MIN_BORES, grid_dim=grid_dims)
+	                            min_bores=MIN_BORES, grid_dim=(xydim,xydim,1))
 	initialize_data!(m, N_INITIAL)
 end
 
@@ -261,7 +267,7 @@ end;
 s0.mainbody_map |> plot_ore_map
 
 # ╔═╡ 3c3eddc9-bfb7-4af8-98ba-f583a95126ec
-s0.ore_map |> plot_ore_map
+s0.ore_map |> plot_ore_map; title!("true (noisy) ore field")
 
 # ╔═╡ b2cebfa0-59a6-4af5-9997-610ab1e5db90
 begin
@@ -364,7 +370,10 @@ end
 gp_ore_map = Base.rand(ds0.rng, ds0.gp_distribution, 1); plot_ore_map(gp_ore_map)
 
 # ╔═╡ 1ab44e34-b0d4-477a-90a0-9f578e1eedd9
-plot_ore_map(s0.ore_map)
+begin
+	plot_ore_map(imresize(s0.ore_map[:,:,1], (xydim,xydim)))
+	title!("true ore field $(xydim)x$(xydim)")
+end	
 
 # ╔═╡ 26638f04-b7d2-49a1-9d20-a774c7ef232e
 begin
@@ -529,11 +538,13 @@ r2 = last.(poutput)
 # ╠═3eaf3478-e970-4d58-8243-911b0a7ef65b
 # ╠═2ea1631f-47ef-49c0-92c7-9ee9d09501d8
 # ╠═602affac-25ef-4f0c-aa8c-d34958bc4ff7
+# ╠═dc115277-7458-413a-9e2e-a166cbca069e
 # ╟─4cbaf630-1793-4250-a3ef-e6a59d33d8df
 # ╠═e45a4fe0-b82d-4101-aa77-eff2a4aaf941
 # ╠═9b2abacb-2ce5-4590-978d-a8827b12091c
 # ╠═9239edb5-7607-4d12-9d93-edd34c0094d8
 # ╟─56b34fe6-91f0-45fe-9d62-aeaff821f619
+# ╠═836c9078-5899-439b-b62c-9bb14fe187ea
 # ╠═7597e5aa-3fce-484f-8667-1356d086b6a5
 # ╠═81c94714-bdb4-4005-81f8-4332acea48b2
 # ╠═1ab44e34-b0d4-477a-90a0-9f578e1eedd9

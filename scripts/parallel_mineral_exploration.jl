@@ -10,7 +10,8 @@ using Distributed
 @everywhere using Distributions
 @everywhere using MineralExploration
 @everywhere using MixedFidelityModelSelection
-@everywhere import BSON: @save
+@everywhere using ProgressMeter
+@everywhere using BSON
 
 @everywhere begin
     @with_kw struct MEJobParameters <: JobParameters
@@ -198,11 +199,12 @@ using Distributed
     end
 
 
-    fileformat(results::MEResults) = fileformat(results.config)
+    mainbody_type_string(config::MEConfiguration) = replace(lowercase(string(config.mainbody_type)), "node"=>"")
 
+    fileformat(results::MEResults) = fileformat(results.config)
     function fileformat(config::MEConfiguration)
         seed = string("seed", config.seed)
-        mainbody_type = replace(lowercase(string(config.mainbody_type)), "node"=>"")
+        mainbody_type = mainbody_type_string(config)
         grid_dims = string(config.grid_dims[1], "x", config.grid_dims[2])
         pomcpow_iters = string("pomcpow", config.pomcpow_iters)
         # job_params_hash = string("params", "0x", string(hash(config.params); base=16))
@@ -212,9 +214,11 @@ using Distributed
     end
 
 
+    results_filename(results_or_config::Union{Results,MEConfiguration}, results_dir::String) = joinpath(results_dir, string(fileformat(results_or_config), ".bson"))
+
     function save(results::Results, results_dir::String)
         !isdir(results_dir) && mkdir(results_dir)
-        filename = joinpath(results_dir, string(fileformat(results), ".bson"))
+        filename = results_filename(results, results_dir)
         res = convert(Dict, results)
         @save filename res
     end
@@ -267,6 +271,29 @@ function kickoff(configuration_fn::Function, nbatches)
 end
 
 
-function reduce_results()
-
+function reduce_results(configuration_fn::Function; results_dir=abspath("results"))
+    configs = configuration_fn()
+    results = Dict()
+    seen = Dict()
+    @showprogress for config in configs
+        grid_dims = config.grid_dims
+        mainbody_type = Symbol(mainbody_type_string(config))
+        pomcpow_iters = config.pomcpow_iters
+        key = (mainbody_type, grid_dims, pomcpow_iters)
+        filename = results_filename(config, results_dir)
+        res = BSON.load(filename)[:res]
+        res[:config][:mainbody_type] = string(res[:config][:mainbody_type]) # Remove dependence on MineralExploration
+        res[:seed] = config.seed # Note, adding seed value to results.
+        if !haskey(results, key)
+            # Create empty dictionary with key=>[] for all keys
+            # Handles appending to an array of all results (handles array of arrays)
+            results[key] = Dict(zip(keys(res), [[] for _ in 1:length(keys(res))]))
+        end
+        merge!((a,b)->[a...,b], results[key], res)
+    end
+    name = first(configs).params.name
+    combined_results_filename = joinpath(results_dir, "results_$name.bson")
+    @info "Saving results: $combined_results_filename"
+    @save combined_results_filename results
+    return results
 end
