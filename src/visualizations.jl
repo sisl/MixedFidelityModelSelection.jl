@@ -5,14 +5,14 @@ tufte_colors = Dict(
     "pastel_seagreen" => colorant"#14B57F",
     "pastel_green" => colorant"#3EAA0D",
     "pastel_orange" => colorant"#C38D09",
-    "pastel_red" => colorant"#F5615C",  
+    "pastel_red" => colorant"#F5615C",
 )
 
 function plot_ore_mass_distributions(ore_masses, labels, grid_dims)
     latexize = str -> latexstring("\\mathrm{$(replace(str, " "=>"\\; "))}")
 
     shapes = latexize.(labels)
-    
+
     fig = Figure(font="Computer Modern")
     offset_scale = 32
     dim_title = "$(grid_dims[1])×$(grid_dims[2])"
@@ -75,6 +75,8 @@ function plot_rel_error_aggregate(resultsblob, resultsellipse, resultscircle;
     rel_errs_ellipse = resultsellipse[:rel_errors]
     rel_errs_circle = resultscircle[:rel_errors]
     grid_dim = resultsblob[:config][1][:grid_dims][1]
+
+    # :cmyk, :Dark2_3, :darktest, :lighttest
     colors = cgrad(:lighttest, 3, categorical=true)
 
     plot_relative_errors(rel_errs_blob;
@@ -102,3 +104,51 @@ function plot_rel_error_aggregate(resultsblob, resultsellipse, resultscircle;
 end
 
 
+##################################################
+# Plotting utils
+##################################################
+function get_data_xy(results::Dict)
+    X = sort(unique(map(k->k[2][1], collect(keys(results))))) # (x,y,z) grab x
+    Y = sort(unique(map(k->k[3], collect(keys(results))))) # POMCPOW iterations
+    return X, Y
+end
+
+
+function get_colorbar(data::Dict, X::Vector, Y::Vector)
+    Z = [value(data, x, y) for x in X for y in Y]
+    vmin = minimum(Z)
+    vmax = maximum(Z)
+    return get_colorbar(vmin, vmax)
+end
+
+
+function get_colorbar(vmin::Real, vmax::Real; vmid=0)
+    buckets = [vmin, vmin/2, vmid, vmax/2, vmax] # shift colormap so 0 is at center
+    normed = (buckets .- vmin) / (vmax - vmin)
+    return cgrad([:darkred, :red, :white, :forestgreen, :black], normed)
+end
+
+
+function get_colorbar_bounded(datasets::Vector; value_fn)
+    vmin, vmax = bounded_values(datasets; value_fn=value_fn)
+    return get_colorbar(vmin, vmax), vmin, vmax
+end
+
+
+function bounded_values_multi(results; value_fn=regret)
+    bounds = []
+    for m_fn in [minimum, maximum]
+        bound = m_fn(mapreduce(res->value_fn(last(res)), vcat, results))
+        push!(bounds, bound)
+    end
+    return bounds
+end
+
+
+function get_colorbar_bounded_multi(results; value_fn, lower=nothing)
+    vmin, vmax = bounded_values_multi(results; value_fn=value_fn)
+    if !isnothing(lower)
+        vmin = lower # generally for cases when we want a shared 0 lower bound
+    end
+    return get_colorbar_regret(vmin, vmax), vmin, vmax
+end
