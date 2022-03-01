@@ -29,7 +29,7 @@ md"""
 """
 
 # ╔═╡ 62013d0f-8cbd-473a-8ed8-9662a567328b
-results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret.bson")[:results]
+results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret20.bson")[:results]
 
 # ╔═╡ 7d875d7d-e2e8-413f-aece-452b539fca16
 shapekeys = [:blob, :ellipse, :circle]
@@ -89,6 +89,9 @@ wc_acc_res = results_regret[τ_min_accuracy]
 
 # ╔═╡ 2f03b56f-4ea7-4dd3-8974-ecd570ff6c0b
 wc_acc_idx = argmax(regret(results_regret[τ_min_accuracy]))
+
+# ╔═╡ 6b756e10-0f71-4ccb-bc23-ff9a74bba135
+regret(results_regret[τ_min_accuracy])[wc_acc_idx]
 
 # ╔═╡ 2a7d356e-20f8-403b-9e9b-726e54919643
 wc_acc_config = results_regret[τ_min_accuracy][:config][wc_acc_idx]
@@ -169,7 +172,7 @@ fargmin(results_regret, mean_regret)
 
 # ╔═╡ 211cbb7d-d2d8-4e5b-9fbe-6a90bc543985
 function regret_distribution(results, k)
-	histogram(regret(results[k]), bins=4, normalize=:pdf, c=:gray)
+	histogram(regret(results[k]), bins=5, normalize=:pdf, c=:gray)
 	𝒩 = fit(Normal, regret(results[k]))
 	𝒩 = TruncatedNormal(𝒩.μ, 𝒩.σ, 0, Inf)
 	plot!(x->pdf(𝒩,x), c=:red, lw=2)
@@ -197,6 +200,7 @@ regret_distribution(results_regret, τ_max_expected_regret)
 # ╟─71782ce8-1fdf-4140-a53a-9ad70ce5779f
 # ╠═506dc301-81e8-4c80-bf7e-3843f9b911d2
 # ╠═6acd1e62-ca92-4f62-96a6-38bc71ec6871
+# ╠═6b756e10-0f71-4ccb-bc23-ff9a74bba135
 # ╠═2f03b56f-4ea7-4dd3-8974-ecd570ff6c0b
 # ╠═2a7d356e-20f8-403b-9e9b-726e54919643
 # ╠═b850b7fc-641e-498d-87ff-43f6e938abb6
