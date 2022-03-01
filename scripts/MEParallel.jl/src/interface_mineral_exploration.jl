@@ -186,7 +186,7 @@ function job(config::Configuration; results_dir=abspath("results"), save_dir=not
 end
 
 
-mainbody_type_string(config::MEConfiguration) = replace(lowercase(string(config.mainbody_type)), "node"=>"")
+mainbody_type_string(config::MEConfiguration) = replace(lowercase(string(config.mainbody_type.name.name)), "node"=>"")
 
 fileformat(results::MEResults) = fileformat(results.config)
 function fileformat(config::MEConfiguration)

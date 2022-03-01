@@ -69,7 +69,7 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR)
         key = (mainbody_type, grid_dims, pomcpow_iters)
         filename = results_filename(config, results_dir)
         res = BSON.load(filename)[:res]
-        res[:config][:mainbody_type] = string(res[:config][:mainbody_type]) # Remove dependence on MineralExploration
+        res[:config][:mainbody_type] = string(res[:config][:mainbody_type].name.name) # Remove dependence on MineralExploration
         res[:seed] = config.seed # Note, adding seed value to results.
         if !haskey(results, key)
             # Create empty dictionary with key=>[] for all keys
