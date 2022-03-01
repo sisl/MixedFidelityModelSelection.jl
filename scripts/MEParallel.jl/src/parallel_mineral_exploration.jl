@@ -1,4 +1,4 @@
-
+global RESULTS_DIR = abspath(joinpath(@__DIR__, "..", "results"))
 
 function configurations_fixed_bores()
     name = "fixed_bores"
@@ -22,13 +22,24 @@ function configurations_regret()
 end
 
 
+function configurations_regret20()
+    name = "regret20"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=20,
+                             pomcpow_iterations=[10,100,1000],
+                             grid_dims_xys=[10,30,50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))
 end
 
 
-function kickoff(configuration_fn::Function, nbatches; results_dir=abspath("results"))
+function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
     configs = configuration_fn()
     batches = makebatches(configs, nbatches)
 
@@ -45,7 +56,7 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=abspath("resu
 end
 
 
-function reduce_results(configuration_fn::Function; results_dir=abspath("results"))
+function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR)
     configs = configuration_fn()
     results = Dict()
     seen = Dict()

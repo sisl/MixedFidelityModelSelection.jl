@@ -61,7 +61,7 @@ end
 
 
 # TODO: MFMS.configurations
-function configurations(::Type{MEConfiguration};
+function MixedFidelityModelSelection.configurations(::Type{MEConfiguration};
                         pomcpow_iterations=[10,100,1000],
                         grid_dims_xys=[10,30,50],
                         num_seeds=10,
@@ -84,7 +84,7 @@ end
 
 
 # TODO: MFMS.initialize
-function initialize(config::Configuration)
+function MixedFidelityModelSelection.initialize(config::Configuration)
     # Configuration specific option
     seed = config.seed
     grid_dims = config.grid_dims
@@ -143,7 +143,7 @@ end
 
 
 # TODO: MFMS.evaluate
-function evaluate(trial::Trial; save_dir=nothing)
+function MixedFidelityModelSelection.evaluate(trial::Trial; save_dir=nothing)
     grid_dims = trial.config.grid_dims
     pomcpow_iters = trial.config.pomcpow_iters
     seed = trial.config.seed
@@ -204,7 +204,7 @@ end
 results_filename(results_or_config::Union{Results,MEConfiguration}, results_dir::String) = joinpath(results_dir, string(fileformat(results_or_config), ".bson"))
 
 # TODO: MFMS.save
-function save(results::Results, results_dir::String)
+function MixedFidelityModelSelection.save(results::Results, results_dir::String)
     !isdir(results_dir) && mkdir(results_dir)
     filename = results_filename(results, results_dir)
     res = convert(Dict, results)

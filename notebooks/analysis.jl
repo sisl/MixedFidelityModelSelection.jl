@@ -50,7 +50,7 @@ md"""
 """
 
 # ╔═╡ ec1e38f4-6e90-4041-8a96-b1d829de193c
-results = BSON.load("..\\scripts\\results\\results_fixed_bores.bson")[:results]
+results = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_fixed_bores.bson")[:results]
 
 # ╔═╡ 9085cf37-0390-482f-94b4-40e46ce3d51e
 begin
@@ -212,7 +212,7 @@ md"""
 """
 
 # ╔═╡ 44df4b43-e782-47fa-8c64-f48162aa4bd8
-results_regret = BSON.load("..\\scripts\\results\\results_regret.bson")[:results]
+results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret.bson")[:results]
 
 # ╔═╡ cf562730-8ac6-4b45-a311-a8208c3982fb
 shapekeys = [:blob, :ellipse, :circle]
@@ -285,13 +285,21 @@ md"""
 """
 
 # ╔═╡ e92ed5d4-955f-4138-88df-878448f1bd72
-p_pareto, pareto_optimal = plot_pareto(results_regret; return_optimal=true);
+p_pareto, pareto_optimal = plot_pareto(results_regret; minutes=false, return_optimal=true);
 
 # ╔═╡ df4bdef7-6a67-4933-b2a5-121feff6c0ee
 p_pareto
 
 # ╔═╡ 0a2c5707-6b04-48f9-ac2d-200392a62752
 pareto_optimal
+
+# ╔═╡ 1d2062bc-63ee-4103-b476-e1b7aab6c453
+md"""
+# Solution ideas
+"""
+
+# ╔═╡ 98c42154-51c7-4274-bd46-3d53166f0575
+
 
 # ╔═╡ Cell order:
 # ╟─0239ffc0-3b91-4441-86ae-cf505742d810
@@ -348,3 +356,5 @@ pareto_optimal
 # ╠═e92ed5d4-955f-4138-88df-878448f1bd72
 # ╠═df4bdef7-6a67-4933-b2a5-121feff6c0ee
 # ╠═0a2c5707-6b04-48f9-ac2d-200392a62752
+# ╟─1d2062bc-63ee-4103-b476-e1b7aab6c453
+# ╠═98c42154-51c7-4274-bd46-3d53166f0575

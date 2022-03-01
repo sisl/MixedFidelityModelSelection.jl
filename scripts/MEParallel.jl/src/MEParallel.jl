@@ -1,6 +1,6 @@
 module MEParallel
 
-# using Revise
+using Revise
 using POMDPs
 using POMCPOW
 using Plots; default(fontfamily="Computer Modern", framestyle=:box)
@@ -23,15 +23,11 @@ export
     MEConfiguration,
     METrial,
     MEResults,
-    configurations,
-    initialize,
-    evaluate,
     job,
     mainbody_type_string,
     fileformat,
     results_filename,
-    save,
-    # "parallel_mineral_exploration"
+    # "parallel_mineral_exploration.jl"
     configurations_fixed_bores,
     configurations_regret,
     makebatches,

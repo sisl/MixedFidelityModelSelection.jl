@@ -147,6 +147,19 @@ combine_figures(directory_sandbox2, "ore_map.png", "mass_map.png"; side_by_side=
 create_planning_gif_combined(directory_sandbox2, sandbox2_max;
 	output="combined_sandbox2.gif", fps=2, last=20)
 
+# ╔═╡ 017a249f-668c-4f20-8968-00c8743411ca
+md"""
+# Worst case accuracy, then worst regret
+"""
+
+# ╔═╡ 058002fb-c411-4ce0-98be-38cd6bf2de17
+directory_wc =
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\notebooks\\worst_case_accuracy\\"
+
+# ╔═╡ 04fcbe2f-0777-4ba6-953f-c53432e643f6
+create_planning_gif_combined(directory_wc, 5;
+	output="worst_case_accuracy.gif", fps=1, last=20)
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1298,5 +1311,8 @@ version = "3.5.0+0"
 # ╟─82e63de6-8c6f-4e83-be2a-92beaaab3ed4
 # ╠═9ff7c61a-cd52-42ca-aec1-f36afb1e6fdc
 # ╠═e8c3c309-fa66-4900-8858-c5a1c8675168
+# ╟─017a249f-668c-4f20-8968-00c8743411ca
+# ╠═058002fb-c411-4ce0-98be-38cd6bf2de17
+# ╠═04fcbe2f-0777-4ba6-953f-c53432e643f6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
