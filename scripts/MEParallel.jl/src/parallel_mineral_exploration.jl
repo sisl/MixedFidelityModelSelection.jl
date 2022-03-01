@@ -47,14 +47,27 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
         addprocs(nbatches - nprocs())
     end
     @info "Number of processes: $(nprocs())"
+
     progress = Progress(length(configs))
-    @time pmap(batch->begin
-               for config in batch
-                   job(config; results_dir=results_dir)
-                   next!(progress)
-               end
-           end, batches)
-    reduce_results(configuration_fn; results_dir=results_dir)
+    channel = RemoteChannel(()->Channel{Bool}(), 1)
+
+    local results
+
+    @sync begin
+        @async while take!(channel)
+            next!(progress)
+        end
+
+        @time pmap(batch->begin
+                   for config in batch
+                       job(config; results_dir=results_dir)
+                       put!(channel, true) # trigger progress bar update
+                   end
+                   put!(channel, false) # tell printing task to finish
+               end, batches)
+    end
+
+    return reduce_results(configuration_fn; results_dir=results_dir)
 end
 
 

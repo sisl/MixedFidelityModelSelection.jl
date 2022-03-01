@@ -212,7 +212,7 @@ md"""
 """
 
 # ╔═╡ 44df4b43-e782-47fa-8c64-f48162aa4bd8
-results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret.bson")[:results]
+results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret20.bson")[:results]
 
 # ╔═╡ cf562730-8ac6-4b45-a311-a8208c3982fb
 shapekeys = [:blob, :ellipse, :circle]
