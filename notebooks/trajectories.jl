@@ -136,6 +136,12 @@ results.ore_map |> MineralExploration.plot_ore_map
 # ╔═╡ 2ba1013f-7262-42ac-b07a-a9d128f1ce17
 wc_acc_res
 
+# ╔═╡ 235d6716-2908-497f-9001-4b1ed65b5a81
+results_dict = MEParallel.convert(Dict, results)
+
+# ╔═╡ 9d5c8911-3934-465f-9337-b12ef66ca7b2
+regret(results_dict)
+
 # ╔═╡ 2a4125ad-2e2a-4e12-ac38-04ed56c45c2c
 md"""
 # Worst-case: 90th percentile regret
@@ -200,6 +206,8 @@ regret_distribution(results_regret, τ_max_expected_regret)
 # ╠═c781d26c-bbcc-4ea9-a2d4-128d3dfd9bd4
 # ╠═6387dd41-dfc4-4109-8602-077dfb13757e
 # ╠═2ba1013f-7262-42ac-b07a-a9d128f1ce17
+# ╠═235d6716-2908-497f-9001-4b1ed65b5a81
+# ╠═9d5c8911-3934-465f-9337-b12ef66ca7b2
 # ╟─2a4125ad-2e2a-4e12-ac38-04ed56c45c2c
 # ╠═081c6ba0-4155-4d96-a8d8-b387f2cc5244
 # ╠═a45ba4d6-df96-47c5-a129-a6eab357bed3

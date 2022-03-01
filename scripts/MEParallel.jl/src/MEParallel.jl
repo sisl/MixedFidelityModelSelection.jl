@@ -24,6 +24,7 @@ export
     MEConfiguration,
     METrial,
     MEResults,
+    convert,
     job,
     mainbody_type_string,
     fileformat,

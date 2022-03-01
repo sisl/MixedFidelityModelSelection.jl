@@ -47,9 +47,11 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
         addprocs(nbatches - nprocs())
     end
     @info "Number of processes: $(nprocs())"
+    progress = Progress(length(configs))
     @time pmap(batch->begin
                for config in batch
                    job(config; results_dir=results_dir)
+                   next!(progress)
                end
            end, batches)
     reduce_results(configuration_fn; results_dir=results_dir)
