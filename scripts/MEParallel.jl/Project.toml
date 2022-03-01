@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 MineralExploration = "8a34a384-1fed-11ec-9621-0242ac130002"
 MixedFidelityModelSelection = "9d78a0d1-c017-464c-9942-b61bfbc69bdb"

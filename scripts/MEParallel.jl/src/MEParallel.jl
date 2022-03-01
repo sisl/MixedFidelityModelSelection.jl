@@ -1,6 +1,7 @@
 module MEParallel
 
 using Revise
+using Distributed
 using POMDPs
 using POMCPOW
 using Plots; default(fontfamily="Computer Modern", framestyle=:box)
