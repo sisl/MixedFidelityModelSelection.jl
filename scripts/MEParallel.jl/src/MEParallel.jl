@@ -30,6 +30,7 @@ export
     # "parallel_mineral_exploration.jl"
     configurations_fixed_bores,
     configurations_regret,
+    configurations_regret20,
     makebatches,
     kickoff,
     reduce_results
