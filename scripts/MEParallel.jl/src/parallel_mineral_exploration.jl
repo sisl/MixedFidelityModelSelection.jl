@@ -66,11 +66,14 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
     end
 
     @time pmap(batch->begin
-               for config in batch
-                   job(config; results_dir=results_dir)
-                   put!(channel, true) # trigger progress bar update
-               end
-           end, batches)
+                for config in batch
+                    # skip if already ran (potentially from a cut-off previous run)
+                    if !isfile(results_filename(config, results_dir))
+                        job(config; results_dir=results_dir)
+                    end
+                    put!(channel, true) # trigger progress bar update
+                end
+            end, batches)
     put!(channel, false) # tell printing task to finish
 
     return reduce_results(configuration_fn; results_dir=results_dir)
