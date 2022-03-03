@@ -32,6 +32,16 @@ function configurations_regret20()
                              grid_dims_xys=[10,30,50])
 end
 
+function configurations_regret100()
+    name = "regret100"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=100,
+                             pomcpow_iterations=[10,100,1000],
+                             grid_dims_xys=[10,30,50])
+end
+
 
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
