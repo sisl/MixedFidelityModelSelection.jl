@@ -34,6 +34,7 @@ export
     configurations_regret,
     configurations_regret20,
     configurations_regret100,
+    configurations_10K_blobbiasfix,
     makebatches,
     kickoff,
     reduce_results
