@@ -20,8 +20,8 @@ function plot_sweep_regret(results, shapekeys, regret_fn, regret_title; colorbar
             cmap=shared_cmap_regret, clims=regret_clims, kwargs...)
     end
 
-    rgtitle = plot(title="$regret_title [truth-belief]",
-                   grid=false, axis=false, tick=nothing, bottom_margin=-50Plots.px)
+    rgtitle = plot(title="$regret_title",
+                   grid=false, axis=false, tick=nothing, top_margin=-5Plots.mm)
 
     rgplot = plot([rgfunc(s; show_ylabel=(s==1), show_xlabel=(s==2))
                    for s in 1:length(shapekeys)]...,
@@ -29,9 +29,15 @@ function plot_sweep_regret(results, shapekeys, regret_fn, regret_title; colorbar
     rgcbar = scatter([0], [0], alpha=0,
         zcolor=[regret_clims...], clims=regret_clims, c=shared_cmap_regret,
         axis=false, tick=nothing, label=false)
+    rgcbar = contourf([0], [0], (x,y)->0,
+        clims=regret_clims, levels=15,
+        c=shared_cmap_regret, axis=false, tick=nothing, label=false)
+    # rgcbar = scatter([0], [0], alpha=0,
+    #     zcolor=[regret_clims...], clims=regret_clims, c=shared_cmap_regret,
+    #     axis=false, tick=nothing, label=false)
     plot(rgtitle, rgplot, rgcbar,
          layout=@layout([a{0.01h}; b c{0.1w}]),
-         size=(710,280), bottom_margin=5mm)
+         size=(710,250), bottom_margin=5mm)
 end
 
 
@@ -40,7 +46,7 @@ function plot_regret(results, shapekey;
         show_cbar=!reduced, show_xlabel=!reduced, show_ylabel=!reduced,
         value_func=(res->mean(regret(res))))
     plot()
-    title = "blob-$shapekey"
+    title = "$shapekey"
     if reduced
         title!(title)
     else
@@ -62,7 +68,7 @@ function plot_regret(results, shapekey;
     end
 
     contourf!(X, Y, (x,y)->value_func(results[(shapekey, (x,x,1), y)]),
-              c=cmap, cbar=show_cbar, clims=clims, levels=16,
+              c=cmap, cbar=show_cbar, clims=clims, levels=15,
               size=(500,400), yaxis=:log, linewidth=0.25, linecolor=:black)
 
     saved_lims = (xlims(), ylims())

@@ -88,7 +88,7 @@ md"""
 wc_acc_res = results_regret[τ_min_accuracy]
 
 # ╔═╡ 2f03b56f-4ea7-4dd3-8974-ecd570ff6c0b
-wc_acc_idx = argmax(regret(results_regret[τ_min_accuracy]))
+wc_acc_idx = 18 # 18 # argmax(regret(results_regret[τ_min_accuracy]))
 
 # ╔═╡ 6b756e10-0f71-4ccb-bc23-ff9a74bba135
 regret(results_regret[τ_min_accuracy])[wc_acc_idx]
@@ -133,17 +133,14 @@ trial = initialize(config)
 # ╔═╡ c781d26c-bbcc-4ea9-a2d4-128d3dfd9bd4
 results = evaluate(trial; save_dir="worst_case_accuracy")
 
-# ╔═╡ 6387dd41-dfc4-4109-8602-077dfb13757e
-results.ore_map |> MineralExploration.plot_ore_map
-
-# ╔═╡ 2ba1013f-7262-42ac-b07a-a9d128f1ce17
-wc_acc_res
-
 # ╔═╡ 235d6716-2908-497f-9001-4b1ed65b5a81
-results_dict = MEParallel.convert(Dict, results)
+results_dict = MEParallel.convert(Dict, results);
 
 # ╔═╡ 9d5c8911-3934-465f-9337-b12ef66ca7b2
 regret(results_dict)
+
+# ╔═╡ 6387dd41-dfc4-4109-8602-077dfb13757e
+results.ore_map |> MineralExploration.plot_ore_map
 
 # ╔═╡ 2a4125ad-2e2a-4e12-ac38-04ed56c45c2c
 md"""
@@ -208,10 +205,9 @@ regret_distribution(results_regret, τ_max_expected_regret)
 # ╠═de18f869-8f5e-4c75-b631-da8ae0f61794
 # ╠═eb9cd498-27b6-4747-9d84-5b02b73c9eae
 # ╠═c781d26c-bbcc-4ea9-a2d4-128d3dfd9bd4
-# ╠═6387dd41-dfc4-4109-8602-077dfb13757e
-# ╠═2ba1013f-7262-42ac-b07a-a9d128f1ce17
 # ╠═235d6716-2908-497f-9001-4b1ed65b5a81
 # ╠═9d5c8911-3934-465f-9337-b12ef66ca7b2
+# ╠═6387dd41-dfc4-4109-8602-077dfb13757e
 # ╟─2a4125ad-2e2a-4e12-ac38-04ed56c45c2c
 # ╠═081c6ba0-4155-4d96-a8d8-b387f2cc5244
 # ╠═a45ba4d6-df96-47c5-a129-a6eab357bed3

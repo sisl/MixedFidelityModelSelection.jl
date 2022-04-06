@@ -43,6 +43,17 @@ function configurations_regret100()
 end
 
 
+function configurations_10K_blobbiasfix()
+    name = "10K_blobbiasfix"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=100,
+                             pomcpow_iterations=[100,1000,10000],
+                             grid_dims_xys=[10,30,50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))

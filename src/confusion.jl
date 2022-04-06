@@ -78,19 +78,22 @@ function plot_accuracies(results, shapekeys)
         plot_accuracy(results, shapekeys[s]; reduced=true, kwargs...)
     end
 
-    mbtitle = plot(title="accuracy [truth-belief]",
-                   grid=false, axis=false, tick=nothing, bottom_margin=-50Plots.px)
+    mbtitle = plot(title="accuracy",
+                   grid=false, axis=false, tick=nothing, top_margin=-5Plots.mm)
 
     mbplot = plot([mbfunc(s; show_ylabel=(s==1), show_xlabel=(s==2))
                    for s in 1:length(shapekeys)]...,
         layout=@layout[A B C], size=(700,210)
     )
-    pcbar = scatter([0], [0], alpha=0,
-        zcolor=[0,1], clims=(0,1), c=get_colorbar(0, 1; vmid=0.5),
-        axis=false, tick=nothing, label=false)
+    pcbar = contourf([0], [0], (x,y)->0,
+              clims=(0,1), levels=15,
+              c=get_colorbar(0, 1; vmid=0.5), axis=false, tick=nothing, label=false)
+    # pcbar = scatter([0], [0], alpha=0,
+    #     zcolor=[0,1], clims=(0,1), c=get_colorbar(0, 1; vmid=0.5),
+    #     axis=false, tick=nothing, label=false)
     plot(mbtitle, mbplot, pcbar,
          layout=@layout([a{0.01h}; b c{0.1w}]),
-         size=(710,280), bottom_margin=5mm)
+         size=(710,250), bottom_margin=5mm)
 end
 
 
@@ -101,7 +104,7 @@ function plot_accuracy(results, shapekey;
         title="accuracy",
     )
     plot()
-    subtitle = "blob-$shapekey"
+    subtitle = "$shapekey"
     if reduced
         title!(subtitle)
     else
