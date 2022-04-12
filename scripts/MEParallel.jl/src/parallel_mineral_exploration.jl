@@ -42,6 +42,16 @@ function configurations_regret100()
                              grid_dims_xys=[10,30,50])
 end
 
+function configurations_biasvar()
+    name = "biasvar"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=100,
+                             # num_realizations=20,
+                             pomcpow_iterations=[10,100,1000],
+                             grid_dims_xys=[10,30,50])
+end
 
 function configurations_10K_blobbiasfix()
     name = "10K_blobbiasfix"
@@ -49,6 +59,16 @@ function configurations_10K_blobbiasfix()
     configs = configurations(MEConfiguration;
                              params=params,
                              num_seeds=100,
+                             pomcpow_iterations=[100,1000,10000],
+                             grid_dims_xys=[10,30,50])
+end
+
+function configurations_500seeds()
+    name = "500seeds"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
                              pomcpow_iterations=[100,1000,10000],
                              grid_dims_xys=[10,30,50])
 end

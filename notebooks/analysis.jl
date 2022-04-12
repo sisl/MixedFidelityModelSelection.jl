@@ -218,7 +218,7 @@ md"""
 """
 
 # ╔═╡ 44df4b43-e782-47fa-8c64-f48162aa4bd8
-results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_regret100.bson")[:results]
+results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_10K_blobbiasfix.bson")[:results]
 
 # ╔═╡ cf562730-8ac6-4b45-a311-a8208c3982fb
 shapekeys = [:blob, :ellipse, :circle]
@@ -633,6 +633,9 @@ bores(res) = mean(res[:n_drills])
 # ╔═╡ 65d715a5-2124-4388-b901-8419a0e786a4
 returns(res) = mean(res[:discounted_return])
 
+# ╔═╡ 33db8806-1e0c-4257-80f8-a4e4a5f2cff5
+returns_var(res) = var(res[:discounted_return])
+
 # ╔═╡ eb73d59a-631d-4bca-8f94-a47f6f6137ef
 res = results_regret[(:blob, (50, 50, 1), 1000)]
 
@@ -675,13 +678,14 @@ plot_stddev(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys,
 plot_mse(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, mse; title="mean squared error (MSE)", kwargs...)
 plot_bores(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, bores; title="num. bores", kwargs...)
 plot_returns(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, returns; title="discounted return", kwargs...)
+plot_returns_var(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, returns_var; title="discounted return (variance)", kwargs...)
 
 function plot_fidelities(results, shapekeys, value_fn; colorbar_fn=value_fn, title="bias", kwargs...)
     shared_cmap, svmin, svmax = get_colorbar_bounded_multi(results; value_fn=colorbar_fn)
 
     if value_fn == bias
         shared_cmap = get_colorbar_bias(svmin, svmax, vmid=0) # :broc # :curl
-    elseif value_fn == variance || value_fn == stddev
+	elseif value_fn == variance || value_fn == stddev || value_fn == returns_var
         shared_cmap = get_colorbar_var(svmin, svmax)
     elseif value_fn == mse
         shared_cmap = get_colorbar_mse(svmin, svmax)
@@ -806,6 +810,9 @@ plot_bores(results_regret, [:blob, :ellipse, :circle])
 # ╔═╡ 9f68eb56-5caf-4bf2-b015-b1d15f58109e
 plot_returns(results_regret, [:blob, :ellipse, :circle])
 
+# ╔═╡ 383c56f8-fb5d-4570-8e53-b9dae53dee33
+plot_returns_var(results_regret, [:blob, :ellipse, :circle])
+
 # ╔═╡ Cell order:
 # ╟─0239ffc0-3b91-4441-86ae-cf505742d810
 # ╠═e4de635f-3564-4044-a62d-d7ee9a6ba95c
@@ -906,6 +913,7 @@ plot_returns(results_regret, [:blob, :ellipse, :circle])
 # ╠═f97c751a-5ebd-4233-85a6-5a7dc59dcd09
 # ╠═189c3d48-7f25-43d6-b10d-b51493b8af7e
 # ╠═65d715a5-2124-4388-b901-8419a0e786a4
+# ╠═33db8806-1e0c-4257-80f8-a4e4a5f2cff5
 # ╠═5232cdc7-5947-4dd7-a054-955f303983ca
 # ╠═14a7c259-f243-4242-8913-34deba5c0659
 # ╠═eb73d59a-631d-4bca-8f94-a47f6f6137ef
@@ -915,4 +923,5 @@ plot_returns(results_regret, [:blob, :ellipse, :circle])
 # ╠═ec019618-4e17-4e1a-a859-c976b01a20f2
 # ╠═47361765-238a-414d-ab0f-ca0afb31b0cb
 # ╠═9f68eb56-5caf-4bf2-b015-b1d15f58109e
+# ╠═383c56f8-fb5d-4570-8e53-b9dae53dee33
 # ╠═0cd25377-6711-47b3-9c33-35d7df0f0640
