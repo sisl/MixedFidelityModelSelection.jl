@@ -4,6 +4,9 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 576da97a-0f4d-4e93-836a-77b2a1328722
+using LaTeXStrings
+
 # ╔═╡ 8405e36f-b6cf-481c-bb51-b67b67372c92
 using StatsPlots
 
@@ -17,6 +20,43 @@ begin
 	using Statistics
 	using PlutoUI
 	using Plots; default(fontfamily="Computer Modern", framestyle=:box)
+end
+
+# ╔═╡ 2004db0f-c22c-4c66-b630-c1f8ce7e008d
+begin
+using Parameters
+using StatsBase
+
+@with_kw struct RiskMetrics
+    Z # cost data
+    α # probability threshold
+
+    𝒫 # emperical CDF
+    𝒞 # conditional distribution
+
+    mean # expected value
+    var # Value at Risk
+    cvar # Conditional Value at Risk
+    worst # worst case
+end
+
+
+function RiskMetrics(Z,α)
+    # If no failures, no cost distribution.
+    Z = length(Z) == 0 ? [0] : Z
+    𝒫 = ecdf(Z)
+    𝒞 = conditional_distr(𝒫, Z, α)
+    𝔼 = mean(Z)
+    var = VaR(𝒞)
+    cvar = CVaR(𝒞)
+    worst = worst_case(Z)
+    return RiskMetrics(Z=Z, α=α, 𝒫=𝒫, 𝒞=𝒞, mean=𝔼, var=var, cvar=cvar, worst=worst)
+end
+
+conditional_distr(𝒫,Z,α) = filter(z->1-𝒫(z) ≤ α, Z)
+VaR(𝒞) = minimum(𝒞)
+worst_case(Z) = maximum(Z)
+CVaR(𝒞) = mean(𝒞)
 end
 
 # ╔═╡ 41df3571-92bb-4520-b021-73dfd695d07d
@@ -218,7 +258,7 @@ md"""
 """
 
 # ╔═╡ 44df4b43-e782-47fa-8c64-f48162aa4bd8
-results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_10K_blobbiasfix.bson")[:results]
+results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_500seeds.bson")[:results]
 
 # ╔═╡ cf562730-8ac6-4b45-a311-a8208c3982fb
 shapekeys = [:blob, :ellipse, :circle]
@@ -246,10 +286,16 @@ R_\text{best} = \max\left\{0, \text{massive ore} - \text{extraction cost}\right\
 
 # ╔═╡ 157c59f3-8034-4575-9e96-3ef3025170be
 begin
-	plot_cumulative_regret(results_regret, (:ellipse, (10,10,1), 10); α_quantile=0.9)
+	plot_cumulative_regret(results_regret, (:ellipse, (10,10,1), 10000); α_quantile=0.9)
 	plot!(size=(350,200))
 	xlims!(0, 150)
 end
+
+# ╔═╡ d7a983ba-f466-4e4d-b8c4-285455eb41f6
+regrets = regret(results_regret[(:ellipse, (10,10,1), 10_000)])
+
+# ╔═╡ 2b283794-a07c-449e-bac8-a71261e3ddf8
+plot(x->ecdf(regrets)(x), label=false, fill=true, 0, sum(regrets), size=(300,200), fillcolor=:gray, c=:black, titlefontsize=10)
 
 # ╔═╡ 74fdc433-91ff-4c08-9c46-2563be98f317
 regret_fn_90th_quant = (res)->quantile(regret(res), 0.9)
@@ -283,11 +329,105 @@ begin
 		regret_title_quant90; colorbar_regret_fn=regret_fn_90th_quant)
 end
 
+# ╔═╡ 1e4080c8-425c-41c7-820a-8db73b360422
+begin
+	runtime_fn = res->mean(map(t->t.time/60, res[:timing]))
+	p_runtime = plot_sweep_regret(results_regret, shapekeys, runtime_fn, 
+		"expected runtime (min.)")
+end
+
 # ╔═╡ c1bccfa7-9f45-4ed2-8a4b-5a269329ed0a
-quantile(regret(results_regret[:blob, (50,50,1), 10]), 0.2)
+quantile(regret(results_regret[:blob, (50,50,1), 100]), 0.2)
+
+# ╔═╡ dc45cc2b-49fd-4d6f-8d4c-3128c7a353e1
+function plot_cost_distribution(Z)
+    viridis_green = "#238a8dff"
+    return histogram(Z,
+        color=viridis_green,
+        label=nothing,
+        alpha=0.5,
+        reuse=false,
+        framestyle=:box,
+        xlabel=L"\operatorname{cost}",
+        ylabel=L"\operatorname{density}",
+        normalize=:pdf, size=(600, 300))
+end
+
+# ╔═╡ 091cf554-4a75-4973-978a-d727525fe5e8
+zero_ylims(adjust=0.001) = ylims!(0, ylims()[2]+adjust)
+
+# ╔═╡ 9a45a33b-c591-45be-96ad-abc599a1dd2a
+function plot_risk(metrics; mean_y=0.036, var_y=0.02, cvar_y=0.01, α_y=0.017)
+    Z = metrics.Z
+    # P = normalize(fit(Histogram, metrics.Z)) # pdf
+    plot_cost_distribution(Z)
+    font_size = 11
+
+    # Expected cost value
+    𝔼 = metrics.mean
+    plot!([𝔼, 𝔼], [0, mean_y], color="black", linewidth=2, label=nothing)
+    annotate!([(𝔼, mean_y*1.1, text(L"\mathbb{E}[{\operatorname{cost}}]", font_size))])
+
+    # Value at Risk (VaR)
+    var = metrics.var
+    plot!([var, var], [0, var_y], color="black", linewidth=2, label=nothing)
+    annotate!([(var, var_y*1.18, text(L"\operatorname{VaR}", font_size))])
+
+    # Worst case
+    worst = metrics.worst
+    plot!([worst, worst], [0, var_y], color="black", linewidth=2, label=nothing)
+    annotate!([(worst, var_y*1.18, text(L"\operatorname{worst\ case}", font_size))])
+
+    # Conditional Value at Risk (CVaR)
+    cvar = metrics.cvar
+    plot!([cvar, cvar], [0, cvar_y], color="black", linewidth=2, label=nothing)
+    annotate!([(cvar, cvar_y*1.38, text(L"\operatorname{CVaR}", font_size))])
+
+    # α failure probability threshold
+    α_mid = (worst+var)/2
+    plot!([α_mid, worst*0.985], [α_y, α_y], color="gray", linewidth=2, label=nothing, arrow=(:closed, 0.5))
+    plot!([α_mid, var*1.015], [α_y, α_y], color="gray", linewidth=2, label=nothing, arrow=(:closed, 0.5))
+    annotate!([(α_mid, α_y*1.18, text(L"\operatorname{top}\ (1-\alpha)\ \operatorname{quantile}", font_size-3))])
+
+    zero_ylims()
+    xlims!(xlims()[1], worst+0.1worst)
+end
+
+# ╔═╡ 32ca08fd-19ea-41ae-af64-bf1277acbde0
+regret(results_regret[:ellipse, (10,10,1), 10_000]) |> x->histogram(x, normalize=:pdf , xlabel="regret", ylabel="density", title="ellipse belief, 10×10, 10k iterations", size=(400,200), label=false)
 
 # ╔═╡ 9b3036a7-26ac-459f-9150-3cf537258744
 plot_regret(results_regret, :blob)
+
+# ╔═╡ c2d79d2a-72e0-4533-b08c-daedfaadf8ed
+md"""
+# CVaR
+"""
+
+# ╔═╡ a3e8319b-ba04-4a6d-92d4-0573e927da76
+begin
+	α_cvar = 0.1
+	regret_fn_cvar = res->RiskMetrics(regret(res), α_cvar).cvar
+	regret_title_cvar = "regret CVaR (α=$α_cvar)"
+	p_regret_cvar = plot_sweep_regret(results_regret, shapekeys, regret_fn_cvar, 
+		regret_title_cvar)# colorbar_regret_fn=regret_fn_90th_quant)
+end
+
+# ╔═╡ aa761b91-7b08-43cd-92a9-cb2af2602985
+risk_metrics = RiskMetrics(regret(results_regret[:ellipse, (10,10,1), 10_000]), α_cvar)
+
+# ╔═╡ 42b0cd45-3f60-4d24-8efb-c21c507262e4
+begin
+	plot_risk(risk_metrics; mean_y=0.06, var_y=0.03, cvar_y=0.012, α_y=0.022)
+	xlabel!("regret")
+	title!("ellipse belief, 10×10, 10k iterations (α=$α_cvar)")
+end
+
+# ╔═╡ b3b22049-2462-4567-b258-bbb3625d7f87
+begin
+	plot_sweep_regret(results_regret, shapekeys, regret_fn_mean,
+		regret_title_mean; colorbar_regret_fn=regret_fn_cvar)
+end
 
 # ╔═╡ c21fe459-c5c6-4324-ac17-005dddc94bb7
 md"""
@@ -295,7 +435,7 @@ md"""
 """
 
 # ╔═╡ e92ed5d4-955f-4138-88df-878448f1bd72
-p_pareto, pareto_optimal = plot_pareto(results_regret; minutes=true, return_optimal=true);
+p_pareto, pareto_optimal = plot_pareto(results_regret; minutes=true, return_optimal=true); #, fn=regrets->RiskMetrics(regrets, α_cvar).cvar);
 
 # ╔═╡ df4bdef7-6a67-4933-b2a5-121feff6c0ee
 p_pareto
@@ -677,7 +817,7 @@ plot_variances(results, shapekeys; kwargs...) = plot_fidelities(results, shapeke
 plot_stddev(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, stddev; title="standard deviation", kwargs...)
 plot_mse(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, mse; title="mean squared error (MSE)", kwargs...)
 plot_bores(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, bores; title="num. bores", kwargs...)
-plot_returns(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, returns; title="discounted return", kwargs...)
+plot_returns(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, returns; title="discounted return (mean)", kwargs...)
 plot_returns_var(results, shapekeys; kwargs...) = plot_fidelities(results, shapekeys, returns_var; title="discounted return (variance)", kwargs...)
 
 function plot_fidelities(results, shapekeys, value_fn; colorbar_fn=value_fn, title="bias", kwargs...)
@@ -813,6 +953,14 @@ plot_returns(results_regret, [:blob, :ellipse, :circle])
 # ╔═╡ 383c56f8-fb5d-4570-8e53-b9dae53dee33
 plot_returns_var(results_regret, [:blob, :ellipse, :circle])
 
+# ╔═╡ 8b0cb3f8-a984-4e35-a89b-7ba4b6d64511
+md"""
+# KoBold Plots
+"""
+
+# ╔═╡ e8abdedd-4bf2-44a5-a233-5a15390c815e
+
+
 # ╔═╡ Cell order:
 # ╟─0239ffc0-3b91-4441-86ae-cf505742d810
 # ╠═e4de635f-3564-4044-a62d-d7ee9a6ba95c
@@ -857,13 +1005,27 @@ plot_returns_var(results_regret, [:blob, :ellipse, :circle])
 # ╠═9e716e52-b402-442d-9ee4-36612d2d72d0
 # ╟─53d2a31e-0fd5-49a9-ae81-5a55b22e328d
 # ╠═157c59f3-8034-4575-9e96-3ef3025170be
+# ╠═d7a983ba-f466-4e4d-b8c4-285455eb41f6
+# ╠═2b283794-a07c-449e-bac8-a71261e3ddf8
 # ╠═eaebf4df-c915-4136-aa99-7101563d4aca
 # ╠═74fdc433-91ff-4c08-9c46-2563be98f317
 # ╠═b3296ce7-f606-4c43-b10a-3603c887be4e
 # ╠═94b106f6-409d-457f-a4a7-4ad68a9fd0ef
 # ╠═3bad29de-edc2-4248-b5fb-5c1aa360c457
+# ╠═1e4080c8-425c-41c7-820a-8db73b360422
 # ╠═c1bccfa7-9f45-4ed2-8a4b-5a269329ed0a
+# ╠═576da97a-0f4d-4e93-836a-77b2a1328722
+# ╠═9a45a33b-c591-45be-96ad-abc599a1dd2a
+# ╠═dc45cc2b-49fd-4d6f-8d4c-3128c7a353e1
+# ╠═091cf554-4a75-4973-978a-d727525fe5e8
+# ╠═aa761b91-7b08-43cd-92a9-cb2af2602985
+# ╠═42b0cd45-3f60-4d24-8efb-c21c507262e4
+# ╠═32ca08fd-19ea-41ae-af64-bf1277acbde0
 # ╠═9b3036a7-26ac-459f-9150-3cf537258744
+# ╟─c2d79d2a-72e0-4533-b08c-daedfaadf8ed
+# ╠═2004db0f-c22c-4c66-b630-c1f8ce7e008d
+# ╠═a3e8319b-ba04-4a6d-92d4-0573e927da76
+# ╠═b3b22049-2462-4567-b258-bbb3625d7f87
 # ╟─c21fe459-c5c6-4324-ac17-005dddc94bb7
 # ╠═e92ed5d4-955f-4138-88df-878448f1bd72
 # ╠═df4bdef7-6a67-4933-b2a5-121feff6c0ee
@@ -925,3 +1087,5 @@ plot_returns_var(results_regret, [:blob, :ellipse, :circle])
 # ╠═9f68eb56-5caf-4bf2-b015-b1d15f58109e
 # ╠═383c56f8-fb5d-4570-8e53-b9dae53dee33
 # ╠═0cd25377-6711-47b3-9c33-35d7df0f0640
+# ╟─8b0cb3f8-a984-4e35-a89b-7ba4b6d64511
+# ╠═e8abdedd-4bf2-44a5-a233-5a15390c815e

@@ -36,6 +36,7 @@ export
     configurations_regret100,
     configurations_10K_blobbiasfix,
     configurations_500seeds,
+    configurations_fixed_bores_500,
     makebatches,
     kickoff,
     reduce_results

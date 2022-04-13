@@ -10,6 +10,16 @@ function configurations_fixed_bores()
                              grid_dims_xys=[30,50])
 end
 
+function configurations_fixed_bores_500()
+    name = "fixed_bores_500"
+    params = MEJobParameters(name=name, min_bores=20, max_bores=20)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
+                             pomcpow_iterations=[1000],
+                             grid_dims_xys=[30,50])
+end
+
 
 function configurations_regret()
     name = "regret"

@@ -4,7 +4,7 @@ end
 
 
 function plot_pareto(results;
-        minutes=true, show_origin=false, return_optimal=false, p=Inf)
+        minutes=true, show_origin=false, return_optimal=false, p=Inf, fn=mean)
     plot()
     mean_timings = Dict()
     std_timings = Dict()
@@ -23,7 +23,7 @@ function plot_pareto(results;
         std_time = std(times)
 
         regrets = regret(value)
-        mean_regret = mean(regrets)
+        mean_regret = fn(regrets)
         std_regret = std(regrets)
 
         key = "$shape, $(xy)x$(xy), $iters"
@@ -46,11 +46,11 @@ function plot_pareto(results;
         elseif xy == 50
             c = :blue
         end
-        if iters == 10
+        if iters == 100
             ms = 4
-        elseif iters == 100
-            ms = 8
         elseif iters == 1000
+            ms = 8
+        elseif iters == 10000
             ms = 16
         end
 

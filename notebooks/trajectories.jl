@@ -179,6 +179,18 @@ end
 # ╔═╡ 4c1554ea-7451-4edd-b2d6-d4c56d17d7f0
 regret_distribution(results_regret, τ_max_expected_regret)
 
+# ╔═╡ 675f654e-ad55-432a-a421-ca9a28737353
+md"""
+# Plots
+"""
+
+# ╔═╡ e11f7f67-ac9b-4df5-a678-8172b499152f
+begin
+	MEParallel.Random.seed!(10)
+	rand(MEParallel.POMDPs.initialstate_distribution(trial.problem); truth=true).ore_map |> 	MineralExploration.plot_ore_map
+	title!("true ore field (smoothed)")
+end
+
 # ╔═╡ Cell order:
 # ╠═a333c86e-d90e-49e5-8623-8e844ad2a9b8
 # ╟─fb8868be-997f-11ec-0fb4-37f4c70c68c7
@@ -218,3 +230,5 @@ regret_distribution(results_regret, τ_max_expected_regret)
 # ╠═56b40041-50fa-43f3-b260-f3b189bf21a7
 # ╠═211cbb7d-d2d8-4e5b-9fbe-6a90bc543985
 # ╠═4c1554ea-7451-4edd-b2d6-d4c56d17d7f0
+# ╟─675f654e-ad55-432a-a421-ca9a28737353
+# ╠═e11f7f67-ac9b-4df5-a678-8172b499152f
