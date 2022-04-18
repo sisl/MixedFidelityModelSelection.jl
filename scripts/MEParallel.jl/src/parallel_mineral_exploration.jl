@@ -10,6 +10,7 @@ function configurations_fixed_bores()
                              grid_dims_xys=[30,50])
 end
 
+
 function configurations_fixed_bores_500()
     name = "fixed_bores_500"
     params = MEJobParameters(name=name, min_bores=20, max_bores=20)
@@ -81,6 +82,17 @@ function configurations_500seeds()
                              num_seeds=500,
                              pomcpow_iterations=[100,1000,10000],
                              grid_dims_xys=[10,30,50])
+end
+
+
+function configurations_random_policy()
+    name = "random_policy"
+    params = MEJobParameters(name=name, min_bores=20, max_bores=20)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
+                             pomcpow_iterations=[-1],
+                             grid_dims_xys=[50])
 end
 
 

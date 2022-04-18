@@ -122,21 +122,25 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
     up = MEBeliefUpdater(m, 1000, 2.0)
     b0 = POMDPs.initialize_belief(up, ds0)
 
-    solver = POMCPOWSolver(tree_queries=pomcpow_iters,
-                           check_repeat_obs=true,
-                           check_repeat_act=true,
-                           next_action=NextActionSampler(),
-                           k_action=2.0,
-                           alpha_action=0.25,
-                           k_observation=2.0,
-                           alpha_observation=0.1,
-                           criterion=POMCPOW.MaxUCB(100.0),
-                           final_criterion=POMCPOW.MaxQ(),
-                           # final_criterion=POMCPOW.MaxTries(),
-                           estimate_value=0.0
-                           # estimate_value=leaf_estimation
-                           )
-    planner = POMDPs.solve(solver, m)
+    if pomcpow_iters == -1
+        planner = RandomPolicy(m; updater=up)
+    else
+        solver = POMCPOWSolver(tree_queries=pomcpow_iters,
+                               check_repeat_obs=true,
+                               check_repeat_act=true,
+                               next_action=NextActionSampler(),
+                               k_action=2.0,
+                               alpha_action=0.25,
+                               k_observation=2.0,
+                               alpha_observation=0.1,
+                               criterion=POMCPOW.MaxUCB(100.0),
+                               final_criterion=POMCPOW.MaxQ(),
+                               # final_criterion=POMCPOW.MaxTries(),
+                               estimate_value=0.0
+                               # estimate_value=leaf_estimation
+                               )
+        planner = POMDPs.solve(solver, m)
+    end
     trial = METrial(config, m, planner, s0, b0, up)
     return trial
 end

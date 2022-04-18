@@ -3,6 +3,7 @@ module MEParallel
 using Revise
 using Distributed
 using POMDPs
+using POMDPPolicies
 using POMCPOW
 using Plots; default(fontfamily="Computer Modern", framestyle=:box)
 using Parameters
@@ -37,6 +38,7 @@ export
     configurations_10K_blobbiasfix,
     configurations_500seeds,
     configurations_fixed_bores_500,
+    configurations_random_policy,
     makebatches,
     kickoff,
     reduce_results
