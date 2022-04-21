@@ -96,6 +96,17 @@ function configurations_random_policy()
 end
 
 
+function configurations_random_policy_100()
+    name = "random_policy_100"
+    params = MEJobParameters(name=name, min_bores=100, max_bores=100)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=100,
+                             pomcpow_iterations=[-1],
+                             grid_dims_xys=[50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))

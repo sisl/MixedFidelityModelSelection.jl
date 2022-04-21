@@ -39,6 +39,7 @@ export
     configurations_500seeds,
     configurations_fixed_bores_500,
     configurations_random_policy,
+    configurations_random_policy_100,
     makebatches,
     kickoff,
     reduce_results
