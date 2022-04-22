@@ -107,6 +107,17 @@ function configurations_random_policy_100()
 end
 
 
+function configurations_blob_points_recomputed()
+    name = "blob_points_recomputed"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
+                             pomcpow_iterations=[100,1000,10000],
+                             grid_dims_xys=[10,30,50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))

@@ -54,7 +54,7 @@ function plot_relative_errors(rel_errs_vector; c=:crimson, label=false, hold=fal
     ts = [1:length(μ_rel_errs);] .- 1
     plot_fn = hold ? plot! : plot
     plot_fn(ts, μ_rel_errs,
-            title="relative volume error (aggregate: $gds, 10 seeds)",
+            title="relative volume error (aggregate: $gds, 500 seeds)",
             ribbon=σ_rel_errs, fillalpha=0.1,
             marker=(marker, 3, 1.0),
             bg_inside=:white,
