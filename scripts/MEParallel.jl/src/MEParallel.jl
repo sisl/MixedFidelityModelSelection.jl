@@ -40,6 +40,7 @@ export
     configurations_fixed_bores_500,
     configurations_random_policy,
     configurations_random_policy_100,
+    configurations_blob_points_recomputed,
     makebatches,
     kickoff,
     reduce_results
