@@ -118,7 +118,6 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
     ds0 = POMDPs.initialstate_distribution(m)
     s0 = rand(ds0; truth=true)
 
-    Random.seed!(seed)
     up = MEBeliefUpdater(m, 1000, 2.0)
     b0 = POMDPs.initialize_belief(up, ds0)
 

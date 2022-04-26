@@ -129,6 +129,17 @@ function configurations_blob_copied()
 end
 
 
+function configurations_blob_clamped()
+    name = "blob_clamped"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
+                             pomcpow_iterations=[100,1000,10000],
+                             grid_dims_xys=[10,30,50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))
