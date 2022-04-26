@@ -118,6 +118,17 @@ function configurations_blob_points_recomputed()
 end
 
 
+function configurations_blob_copied()
+    name = "blob_copied"
+    params = MEJobParameters(name=name)
+    configs = configurations(MEConfiguration;
+                             params=params,
+                             num_seeds=500,
+                             pomcpow_iterations=[100,1000,10000],
+                             grid_dims_xys=[10,30,50])
+end
+
+
 function makebatches(configs::Vector{<:Configuration}, n)
     batchsizes = round(Int, length(configs)/n)
     return collect(Iterators.partition(configs, batchsizes))
@@ -179,7 +190,7 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, par
             if partial
                 @warn err
             else
-                throw(err)
+                rethrow()
             end
         end
     end

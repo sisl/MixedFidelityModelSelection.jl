@@ -41,6 +41,7 @@ export
     configurations_random_policy,
     configurations_random_policy_100,
     configurations_blob_points_recomputed,
+    configurations_blob_copied,
     makebatches,
     kickoff,
     reduce_results
