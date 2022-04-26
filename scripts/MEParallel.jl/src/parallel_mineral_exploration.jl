@@ -155,7 +155,7 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
 end
 
 
-function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR)
+function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, partial=false)
     configs = configuration_fn()
     results = Dict()
     seen = Dict()
@@ -165,15 +165,23 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR)
         pomcpow_iters = config.pomcpow_iters
         key = (mainbody_type, grid_dims, pomcpow_iters)
         filename = results_filename(config, results_dir)
-        res = BSON.load(filename)[:res]
-        res[:config][:mainbody_type] = string(res[:config][:mainbody_type].name.name) # Remove dependence on MineralExploration
-        res[:seed] = config.seed # Note, adding seed value to results.
-        if !haskey(results, key)
-            # Create empty dictionary with key=>[] for all keys
-            # Handles appending to an array of all results (handles array of arrays)
-            results[key] = Dict(zip(keys(res), [[] for _ in 1:length(keys(res))]))
+        try
+            res = BSON.load(filename)[:res]
+            res[:config][:mainbody_type] = string(res[:config][:mainbody_type].name.name) # Remove dependence on MineralExploration
+            res[:seed] = config.seed # Note, adding seed value to results.
+            if !haskey(results, key)
+                # Create empty dictionary with key=>[] for all keys
+                # Handles appending to an array of all results (handles array of arrays)
+                results[key] = Dict(zip(keys(res), [[] for _ in 1:length(keys(res))]))
+            end
+            merge!((a,b)->[a...,b], results[key], res)
+        catch err
+            if partial
+                @warn err
+            else
+                throw(err)
+            end
         end
-        merge!((a,b)->[a...,b], results[key], res)
     end
     name = first(configs).params.name
     combined_results_filename = joinpath(results_dir, "results_$name.bson")
