@@ -43,6 +43,7 @@ export
     configurations_blob_points_recomputed,
     configurations_blob_copied,
     configurations_blob_clamped,
+    configurations_standard,
     makebatches,
     kickoff,
     reduce_results
