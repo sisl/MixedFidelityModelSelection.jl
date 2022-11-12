@@ -55,7 +55,8 @@ include("regret.jl")
 
 export
     goal_programming,
-    plot_pareto
+    plot_pareto,
+    plot_pareto_3d
 include("pareto.jl")
 
 export

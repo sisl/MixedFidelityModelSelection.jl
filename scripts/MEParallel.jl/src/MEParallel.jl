@@ -18,6 +18,7 @@ import BSON: @save
 
 include("interface_mineral_exploration.jl")
 include("parallel_mineral_exploration.jl")
+include("simdec.jl")
 
 export
     # "interface_mineral_exploration.jl"
@@ -46,6 +47,12 @@ export
     configurations_standard,
     makebatches,
     kickoff,
-    reduce_results
+    reduce_results,
+    SimDecTargets,
+    SimDecHeader,
+    SimDecParameters,
+    sample_simdec_configurations,
+    simdec_header,
+    save_simdec_csv
 
 end # module

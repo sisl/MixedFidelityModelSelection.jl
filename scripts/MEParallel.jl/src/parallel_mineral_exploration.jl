@@ -156,7 +156,7 @@ function makebatches(configs::Vector{<:Configuration}, n)
 end
 
 
-function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
+function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR, rerun=false)
     configs = configuration_fn()
     batches = makebatches(configs, nbatches)
 
@@ -175,13 +175,28 @@ function kickoff(configuration_fn::Function, nbatches; results_dir=RESULTS_DIR)
     @time pmap(batch->begin
                 for config in batch
                     # skip if already ran (potentially from a cut-off previous run)
-                    if !isfile(results_filename(config, results_dir))
+                    if !isfile(results_filename(config, results_dir)) || rerun
                         job(config; results_dir=results_dir)
                     end
                     put!(channel, true) # trigger progress bar update
                 end
             end, batches)
     put!(channel, false) # tell printing task to finish
+
+    return reduce_results(configuration_fn; results_dir=results_dir)
+end
+
+
+function kickoff(configuration_fn::Function; results_dir=RESULTS_DIR, rerun=false)
+    configs = configuration_fn()
+
+    @time @showprogress for config in configs
+        # skip if already ran (potentially from a cut-off previous run)
+        if !isfile(results_filename(config, results_dir)) || rerun
+            @info "———"
+            job(config; results_dir=results_dir)
+        end
+    end
 
     return reduce_results(configuration_fn; results_dir=results_dir)
 end
@@ -198,7 +213,7 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, par
         key = (mainbody_type, grid_dims, pomcpow_iters)
         filename = results_filename(config, results_dir)
         try
-            res = BSON.load(filename)[:res]
+            res = BSON.load(filename, @__MODULE__)[:res]
             res[:config][:mainbody_type] = string(res[:config][:mainbody_type].name.name) # Remove dependence on MineralExploration
             res[:seed] = config.seed # Note, adding seed value to results.
             if !haskey(results, key)

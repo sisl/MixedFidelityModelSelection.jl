@@ -160,6 +160,25 @@ directory_wc =
 create_planning_gif_combined(directory_wc, 5;
 	output="worst_case_accuracy.gif", fps=1, last=20)
 
+# ╔═╡ 6931e529-dbbc-493c-9fc5-4ab29e7bc1a5
+md"""
+# Bias
+"""
+
+# ╔═╡ e3b6567b-300d-4821-8484-8d1329d91d02
+directory_bias =
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\notebooks\\worst_case_bias\\"
+
+# ╔═╡ 250d4bde-f965-4b92-894f-94c4ee2839d3
+bias_max = 6
+
+# ╔═╡ 207b447f-47e7-4172-99c8-96bb794f78cc
+combine_figures(directory_bias, "ore_map.png", "mass_map.png"; side_by_side=false)
+
+# ╔═╡ 9513a7a1-1ca2-43fe-89ba-31234410808c
+create_planning_gif_combined(directory_bias, bias_max;
+	output="combined_bias.gif", fps=2, last=20)
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -689,6 +708,12 @@ git-tree-sha1 = "f6250b16881adf048549549fba48b1161acdac8c"
 uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
 version = "3.100.1+0"
 
+[[deps.LERC_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "bf36f528eec6634efc60d7ec062008f171071434"
+uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
+version = "3.0.0+1"
+
 [[deps.LZO_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "e5b909bcf985c5e2605737d2ce278ed791b89be6"
@@ -749,10 +774,10 @@ uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
 version = "2.35.0+0"
 
 [[deps.Libtiff_jll]]
-deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
-git-tree-sha1 = "340e257aada13f95f98ee352d316c3bed37c8ab9"
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
+git-tree-sha1 = "c9551dd26e31ab17b86cbd00c2ede019c08758eb"
 uuid = "89763e89-9b03-5906-acba-b20f662cd828"
-version = "4.3.0+0"
+version = "4.3.0+1"
 
 [[deps.Libuuid_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1314,5 +1339,10 @@ version = "3.5.0+0"
 # ╟─017a249f-668c-4f20-8968-00c8743411ca
 # ╠═058002fb-c411-4ce0-98be-38cd6bf2de17
 # ╠═04fcbe2f-0777-4ba6-953f-c53432e643f6
+# ╟─6931e529-dbbc-493c-9fc5-4ab29e7bc1a5
+# ╠═e3b6567b-300d-4821-8484-8d1329d91d02
+# ╠═250d4bde-f965-4b92-894f-94c4ee2839d3
+# ╠═207b447f-47e7-4172-99c8-96bb794f78cc
+# ╠═9513a7a1-1ca2-43fe-89ba-31234410808c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

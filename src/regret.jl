@@ -37,14 +37,15 @@ function plot_sweep_regret(results, shapekeys, regret_fn, regret_title; colorbar
     #     axis=false, tick=nothing, label=false)
     plot(rgtitle, rgplot, rgcbar,
          layout=@layout([a{0.01h}; b c{0.1w}]),
-         size=(710,250), bottom_margin=5mm)
+         size=(710,250), bottom_margin=6mm, left_margin=2mm)
 end
 
 
 function plot_regret(results, shapekey;
         reduced=false, cmap=nothing, clims=nothing,
+        is_relative=false, shapekey_relative=:circle,
         show_cbar=!reduced, show_xlabel=!reduced, show_ylabel=!reduced,
-        value_func=(res->mean(regret(res))))
+        value_func=(res->mean(regret(res))), kwargs...)
     plot()
     title = "$shapekey"
     if reduced
@@ -67,9 +68,15 @@ function plot_regret(results, shapekey;
         cmap = get_colorbar_regret(nothing, nothing)
     end
 
-    contourf!(X, Y, (x,y)->value_func(results[(shapekey, (x,x,1), y)]),
+    if is_relative
+        Z = (x,y)->abs(value_func(results[(shapekey, (x,x,1), y)]) - value_func(results[(shapekey_relative, (x,x,1), y)]))
+    else
+        Z = (x,y)->value_func(results[(shapekey, (x,x,1), y)])
+    end
+
+    contourf!(X, Y, Z;
               c=cmap, cbar=show_cbar, clims=clims, levels=15,
-              size=(500,400), yaxis=:log, linewidth=0.25, linecolor=:black)
+              size=(500,400), yaxis=:log, linewidth=0.25, linecolor=:black, kwargs...)
 
     saved_lims = (xlims(), ylims())
     G = [(x, y) for x in X, y in Y]

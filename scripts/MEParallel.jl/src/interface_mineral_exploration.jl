@@ -183,7 +183,7 @@ end
 
 function job(config::Configuration; results_dir=abspath("results"), save_dir=nothing)
     trial = initialize(config)
-    results = evaluate(trial; save_dir=save_dir)
+    results = MixedFidelityModelSelection.evaluate(trial; save_dir=save_dir)
     !isnothing(results_dir) && save(results, results_dir)
     return results::Results
 end

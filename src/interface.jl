@@ -1,4 +1,11 @@
-function configurations(::Type{<:Configuration})::Vector{<:Configuration} end
-function initialize(config::Configuration)::Trial end
-function evaluate(trial::Trial)::Results end
-function save(results::Results) end
+# (::Type{<:Configuration})::Vector{<:Configuration}
+function configurations end
+
+# (config::Configuration)::Trial
+function initialize end
+
+# (trial::Trial)::Results
+function evaluate end
+
+# (results::Results)
+function save end

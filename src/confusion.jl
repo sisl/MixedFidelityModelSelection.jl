@@ -93,7 +93,7 @@ function plot_accuracies(results, shapekeys)
     #     axis=false, tick=nothing, label=false)
     plot(mbtitle, mbplot, pcbar,
          layout=@layout([a{0.01h}; b c{0.1w}]),
-         size=(710,250), bottom_margin=5mm)
+         size=(710,250), bottom_margin=6mm, left_margin=2mm)
 end
 
 

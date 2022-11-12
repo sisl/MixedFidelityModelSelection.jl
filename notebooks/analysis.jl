@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.7
+# v0.19.3
 
 using Markdown
 using InteractiveUtils
@@ -14,8 +14,12 @@ using StatsPlots
 begin
 	using Revise
 	using Pkg
+	Pkg.develop(path="..//..//MineralExploration//")
+	using MineralExploration
 	Pkg.develop(path="..//")
 	using MixedFidelityModelSelection
+	Pkg.develop(path="..//scripts//MEParallel.jl//")
+	using MEParallel
 	using BSON
 	using Statistics
 	using PlutoUI
@@ -96,16 +100,16 @@ md"""
 """
 
 # ╔═╡ ec1e38f4-6e90-4041-8a96-b1d829de193c
-results = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_fixed_bores.bson")[:results]
+results = BSON.load(raw"E:\SCERF\MEParallel.jl\results\results_fixed_bores_500.bson")[:results]
 
 # ╔═╡ 9085cf37-0390-482f-94b4-40e46ce3d51e
 begin
-	results50x50blob = results[(:blob, (50,50,1), 100)]
-	results50x50ellipse = results[(:ellipse, (50,50,1), 100)]
-	results50x50circle = results[(:circle, (50,50,1), 100)]
-    results30x30blob = results[(:blob, (30,30,1), 100)]
-    results30x30ellipse = results[(:ellipse, (30,30,1), 100)]
-    results30x30circle = results[(:circle, (30,30,1), 100)]
+	results50x50blob = results[(:blob, (50,50,1), 1000)]
+	results50x50ellipse = results[(:ellipse, (50,50,1), 1000)]
+	results50x50circle = results[(:circle, (50,50,1), 1000)]
+    results30x30blob = results[(:blob, (30,30,1), 1000)]
+    results30x30ellipse = results[(:ellipse, (30,30,1), 1000)]
+    results30x30circle = results[(:circle, (30,30,1), 1000)]
 end;
 
 # ╔═╡ 13fc2600-3789-4fc7-a31e-357f35db4b37
@@ -185,6 +189,24 @@ plot_rel_error_aggregate(results50x50blob, results50x50ellipse, results50x50circ
 # ╔═╡ 378681c1-8754-4381-bf94-fa956dc58e70
 plot_rel_error_aggregate(results30x30blob, results30x30ellipse, results30x30circle)
 
+# ╔═╡ a685c8e1-2383-4391-8ab3-d007c49a6579
+md"""
+# Random policy
+"""
+
+# ╔═╡ c3725bdd-abd9-4dbe-8841-9522b0892325
+results_random = BSON.load(raw"E:\SCERF\MEParallel.jl\results\results_random_policy.bson")[:results]
+
+# ╔═╡ 98f05090-c043-484d-9bc3-c0699d6327b7
+begin
+	random50x50blob = results_random[(:blob, (50,50,1), -1)]
+	random50x50ellipse = results_random[(:ellipse, (50,50,1), -1)]
+	random50x50circle = results_random[(:circle, (50,50,1), -1)]
+end;
+
+# ╔═╡ b0a8819c-39f1-4b47-bb79-29fb5e070730
+plot_rel_error_aggregate(random50x50blob, random50x50ellipse, random50x50circle)
+
 # ╔═╡ 45ad5118-df2e-44b9-9a24-20067944b06c
 md"""
 ## Polar comparison plots
@@ -258,7 +280,11 @@ md"""
 """
 
 # ╔═╡ 44df4b43-e782-47fa-8c64-f48162aa4bd8
-results_regret = BSON.load("..\\scripts\\MEParallel.jl\\results\\results_500seeds.bson")[:results]
+results_regret = 
+# BSON.load("..\\scripts\\MEParallel.jl\\results\\results_blob_copied.bson")[:results]
+# BSON.load("..\\scripts\\MEParallel.jl\\results\\results_blob_clamped.bson")[:results]
+# BSON.load("..\\scripts\\MEParallel.jl\\results\\results_inject_perturbed.bson")[:results]
+BSON.load(raw"E:\SCERF\MEParallel.jl\results\results_blob_clamped.bson")[:results]
 
 # ╔═╡ cf562730-8ac6-4b45-a311-a8208c3982fb
 shapekeys = [:blob, :ellipse, :circle]
@@ -424,10 +450,10 @@ begin
 end
 
 # ╔═╡ b3b22049-2462-4567-b258-bbb3625d7f87
-begin
-	plot_sweep_regret(results_regret, shapekeys, regret_fn_mean,
-		regret_title_mean; colorbar_regret_fn=regret_fn_cvar)
-end
+# begin
+# 	plot_sweep_regret(results_regret, shapekeys, regret_fn_mean,
+# 		regret_title_mean; colorbar_regret_fn=regret_fn_cvar)
+# end
 
 # ╔═╡ c21fe459-c5c6-4324-ac17-005dddc94bb7
 md"""
@@ -435,22 +461,22 @@ md"""
 """
 
 # ╔═╡ e92ed5d4-955f-4138-88df-878448f1bd72
-p_pareto, pareto_optimal = plot_pareto(results_regret; minutes=true, return_optimal=true); #, fn=regrets->RiskMetrics(regrets, α_cvar).cvar);
+# p_pareto, pareto_optimal = plot_pareto(results_regret; minutes=true, return_optimal=true); #, fn=regrets->RiskMetrics(regrets, α_cvar).cvar);
 
 # ╔═╡ df4bdef7-6a67-4933-b2a5-121feff6c0ee
-p_pareto
+# p_pareto
 
 # ╔═╡ 0a2c5707-6b04-48f9-ac2d-200392a62752
-pareto_optimal
+# pareto_optimal
 
 # ╔═╡ d76fd9c4-bc40-47f9-b6c5-7334e5d2a997
-p_pareto_sec, pareto_optimal_sec = plot_pareto(results_regret; minutes=false, return_optimal=true);
+# p_pareto_sec, pareto_optimal_sec = plot_pareto(results_regret; minutes=false, return_optimal=true);
 
 # ╔═╡ cd15ed2f-a280-4bf3-9d7e-3bb9afa4720d
-p_pareto_sec
+# p_pareto_sec
 
 # ╔═╡ 49cfde98-23b4-48d0-bed3-d739ad3b79f2
-pareto_optimal_sec
+# pareto_optimal_sec
 
 # ╔═╡ 1d2062bc-63ee-4103-b476-e1b7aab6c453
 md"""
@@ -855,7 +881,7 @@ function plot_fidelities(results, shapekeys, value_fn; colorbar_fn=value_fn, tit
     #     axis=false, tick=nothing, label=false)
     plot(ptitle, pplot, pcbar,
          layout=@layout([a{0.01h}; b c{0.1w}]),
-         size=(710,250), bottom_margin=5Plots.mm)
+         size=(710,250), bottom_margin=6Plots.mm, left_margin=2Plots.mm)
 end
 
 
@@ -955,10 +981,13 @@ plot_returns_var(results_regret, [:blob, :ellipse, :circle])
 
 # ╔═╡ 8b0cb3f8-a984-4e35-a89b-7ba4b6d64511
 md"""
-# KoBold Plots
+# Blob bias hypothesis (off-center)
 """
 
-# ╔═╡ e8abdedd-4bf2-44a5-a233-5a15390c815e
+# ╔═╡ 4844fb03-33e8-45a7-8f1f-201019a40e83
+results_regret
+
+# ╔═╡ fb54636a-5221-4b3e-a1eb-c4efca4f1596
 
 
 # ╔═╡ Cell order:
@@ -983,6 +1012,10 @@ md"""
 # ╟─e00d2a2e-2258-4121-b96d-a80e4f30d7e1
 # ╠═93545762-a44d-41a8-8e00-e1493d0748e4
 # ╠═378681c1-8754-4381-bf94-fa956dc58e70
+# ╟─a685c8e1-2383-4391-8ab3-d007c49a6579
+# ╠═c3725bdd-abd9-4dbe-8841-9522b0892325
+# ╠═98f05090-c043-484d-9bc3-c0699d6327b7
+# ╠═b0a8819c-39f1-4b47-bb79-29fb5e070730
 # ╟─45ad5118-df2e-44b9-9a24-20067944b06c
 # ╟─ce02b5d0-4f40-4dcc-897d-8f49082725af
 # ╠═80afea6c-68b1-4f4d-96c6-bae16f3bc8ac
@@ -1088,4 +1121,5 @@ md"""
 # ╠═383c56f8-fb5d-4570-8e53-b9dae53dee33
 # ╠═0cd25377-6711-47b3-9c33-35d7df0f0640
 # ╟─8b0cb3f8-a984-4e35-a89b-7ba4b6d64511
-# ╠═e8abdedd-4bf2-44a5-a233-5a15390c815e
+# ╠═4844fb03-33e8-45a7-8f1f-201019a40e83
+# ╠═fb54636a-5221-4b3e-a1eb-c4efca4f1596
