@@ -205,13 +205,14 @@ end
 function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, partial=false)
     configs = configuration_fn()
     results = Dict()
-    seen = Dict()
+    use_mcts = false
     @showprogress for config in configs
         grid_dims = config.grid_dims
         mainbody_type = Symbol(mainbody_type_string(config))
         pomcpow_iters = config.pomcpow_iters
         key = (mainbody_type, grid_dims, pomcpow_iters)
         filename = results_filename(config, results_dir)
+        use_mcts = config.use_mcts
         try
             res = BSON.load(filename, @__MODULE__)[:res]
             res[:config][:mainbody_type] = string(res[:config][:mainbody_type].name.name) # Remove dependence on MineralExploration
@@ -234,5 +235,14 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, par
     combined_results_filename = joinpath(results_dir, "results_$name.bson")
     @info "Saving results: $combined_results_filename"
     @save combined_results_filename results
+
+    if use_mcts
+        X_train, Y_train = combine_betazero_training_data(results)
+        data = Dict(:X=>X_train, :Y=>Y_train)
+        betazero_results_filename = joinpath(results_dir, "betazero_training_$name.bson")
+        @info "Saving results: $betazero_results_filename"
+        @save betazero_results_filename data
+    end
+
     return results
 end

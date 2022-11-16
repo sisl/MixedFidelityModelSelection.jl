@@ -12,6 +12,7 @@ using Random
 using Distributions
 using MineralExploration
 using MixedFidelityModelSelection
+using MCTS
 using ProgressMeter
 using BSON
 import BSON: @save
@@ -19,6 +20,7 @@ import BSON: @save
 include("interface_mineral_exploration.jl")
 include("parallel_mineral_exploration.jl")
 include("simdec.jl")
+include("betazero.jl")
 
 export
     # "interface_mineral_exploration.jl"
@@ -53,6 +55,7 @@ export
     SimDecParameters,
     sample_simdec_configurations,
     simdec_header,
-    save_simdec_csv
+    save_simdec_csv,
+    sample_training_configurations
 
 end # module

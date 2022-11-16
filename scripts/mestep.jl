@@ -7,7 +7,7 @@ using MineralExploration
 include("MEParallel.jl")
 using .MEParallel
 
-config = MEConfiguration(1, (30,30,1), 10, CircleNode, MEJobParameters(name="step", min_bores=5, max_bores=5))
+config = MEConfiguration(1, (30,30,1), 10, CircleNode, false, MEJobParameters(name="step", min_bores=5, max_bores=5))
 trial = initialize(config)
 
 display(plot(trial.b0))

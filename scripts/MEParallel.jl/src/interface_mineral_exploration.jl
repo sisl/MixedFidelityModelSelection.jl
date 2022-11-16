@@ -14,6 +14,7 @@ struct MEConfiguration <: Configuration
     grid_dims::Tuple{Real,Real,Real}
     pomcpow_iters::Int
     mainbody_type::Type{<:MainbodyGen}
+    use_mcts::Bool
     params::MEJobParameters
 end
 
@@ -47,6 +48,14 @@ end
 end
 
 
+@with_kw struct BetaZeroResults <: Results
+    config::MEConfiguration
+    B::Array # set of beliefs
+    Π::Array # set of policy estimates
+    Z::Array # set of returns
+end
+
+
 function Base.convert(::Type{Dict}, structure::Union{Results, Configuration, JobParameters})
     return Dict(fn=>begin
                         field = getfield(structure, fn)
@@ -73,7 +82,7 @@ function MixedFidelityModelSelection.configurations(::Type{MEConfiguration};
             for mainbody_type in mainbody_types
                 for seed in 1:num_seeds
                     grid_dims = (grid_dims_xy, grid_dims_xy, 1)
-                    config = MEConfiguration(seed, grid_dims, pomcpow_iters, mainbody_type, params)
+                    config = MEConfiguration(seed, grid_dims, pomcpow_iters, mainbody_type, false, params)
                     push!(configs, config)
                 end
             end
@@ -90,6 +99,7 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
     grid_dims = config.grid_dims
     mainbody = config.mainbody_type(grid_dims=grid_dims)
     pomcpow_iters = config.pomcpow_iters
+    use_mcts = config.use_mcts
 
     # Static job parameters
     high_fidelity_dim = config.params.high_fidelity_dim
@@ -121,18 +131,38 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
     up = MEBeliefUpdater(m, 1000, 2.0)
     b0 = POMDPs.initialize_belief(up, ds0)
 
-    if pomcpow_iters == -1
+    exploration_coefficient = 100.0
+    k_action = 2.0
+    alpha_action = 0.25
+
+    if use_mcts
+        next_action = NextActionSampler()
+        f_next_action(bmdp::BeliefMDP, b::MEBelief, h) = POMCPOW.next_action(next_action, bmdp.pomdp, b, h)
+        belief_reward(pomdp::POMDP, b, a, bp) = mean(reward(pomdp, s, a) for s in particles(b))
+        bmdp = BeliefMDP(m, up, belief_reward)
+        estimate_value = (bmdp, b, d) -> 0.0 # mean(MineralExploration.extraction_reward(bmdp.pomdp, s) for s in particles(b))
+        solver = DPWSolver(n_iterations=pomcpow_iters,
+                           check_repeat_action=true,
+                           exploration_constant=exploration_coefficient,
+                           next_action=f_next_action,
+                           k_action=k_action,
+                           alpha_action=alpha_action,
+                           tree_in_info=true,
+                           estimate_value=estimate_value,
+                           show_progress=true)
+        planner = solve(solver, bmdp)
+    elseif pomcpow_iters == -1
         planner = RandomPolicy(m; updater=up)
     else
         solver = POMCPOWSolver(tree_queries=pomcpow_iters,
                                check_repeat_obs=true,
                                check_repeat_act=true,
                                next_action=NextActionSampler(),
-                               k_action=2.0,
-                               alpha_action=0.25,
+                               k_action,
+                               alpha_action,
                                k_observation=2.0,
                                alpha_observation=0.1,
-                               criterion=POMCPOW.MaxUCB(100.0),
+                               criterion=POMCPOW.MaxUCB(exploration_coefficient),
                                final_criterion=POMCPOW.MaxQ(),
                                # final_criterion=POMCPOW.MaxTries(),
                                estimate_value=0.0
@@ -161,22 +191,30 @@ function MixedFidelityModelSelection.evaluate(trial::Trial; save_dir=nothing)
 
     Random.seed!(trial.config.seed)
     timing = @timed begin
-        trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false, verbose=false)
+        trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false, verbose=false, collect_training_data=trial.config.use_mcts)
     end
 
-    results = MEResults(config=trial.config,
-                        timing=timing,
-                        ore_map=s0.ore_map,
-                        mass_map=s0.ore_map .>= m.massive_threshold,
-                        massive_threshold=m.massive_threshold,
-                        discounted_return=trial_results[1],
-                        distances=trial_results[2],
-                        abs_errors=trial_results[3],
-                        rel_errors=trial_results[4],
-                        vol_stds=trial_results[5],
-                        n_drills=trial_results[6],
-                        r_massive=trial_results[7],
-                        last_action=trial_results[8])
+    if trial.config.use_mcts
+        data = trial_results[end]
+        results = BetaZeroResults(config=trial.config,
+                                  B=[d.b for d in data],
+                                  Π=[d.π for d in data],
+                                  Z=[d.z for d in data])
+    else
+        results = MEResults(config=trial.config,
+                            timing=timing,
+                            ore_map=s0.ore_map,
+                            mass_map=s0.ore_map .>= m.massive_threshold,
+                            massive_threshold=m.massive_threshold,
+                            discounted_return=trial_results[1],
+                            distances=trial_results[2],
+                            abs_errors=trial_results[3],
+                            rel_errors=trial_results[4],
+                            vol_stds=trial_results[5],
+                            n_drills=trial_results[6],
+                            r_massive=trial_results[7],
+                            last_action=trial_results[8])
+    end
     return results::Results
 end
 
@@ -191,18 +229,18 @@ end
 
 mainbody_type_string(config::MEConfiguration) = replace(lowercase(string(config.mainbody_type.name.name)), "node"=>"")
 
-fileformat(results::MEResults) = fileformat(results.config)
+fileformat(results::Results) = fileformat(results.config)
 function fileformat(config::MEConfiguration)
     seed = string("seed", config.seed)
     mainbody_type = mainbody_type_string(config)
     grid_dims = string(config.grid_dims[1], "x", config.grid_dims[2])
-    pomcpow_iters = string("pomcpow", config.pomcpow_iters)
+    planner_str = config.use_mcts ? "mcts" : "pomcpow"
+    pomcpow_iters = string(planner_str, config.pomcpow_iters)
     # job_params_hash = string("params", "0x", string(hash(config.params); base=16))
 
     filename = join(["results", seed, mainbody_type, grid_dims, pomcpow_iters, config.params.name], "_")
     return filename
 end
-
 
 results_filename(results_or_config::Union{Results,MEConfiguration}, results_dir::String) = joinpath(results_dir, string(fileformat(results_or_config), ".bson"))
 
