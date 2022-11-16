@@ -148,8 +148,7 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
                            k_action=k_action,
                            alpha_action=alpha_action,
                            tree_in_info=true,
-                           estimate_value=estimate_value,
-                           show_progress=true)
+                           estimate_value=estimate_value)
         planner = solve(solver, bmdp)
     elseif pomcpow_iters == -1
         planner = RandomPolicy(m; updater=up)
