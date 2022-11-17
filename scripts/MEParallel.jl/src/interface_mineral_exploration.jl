@@ -14,6 +14,7 @@ struct MEConfiguration <: Configuration
     grid_dims::Tuple{Real,Real,Real}
     pomcpow_iters::Int
     mainbody_type::Type{<:MainbodyGen}
+    collect_betazero::Bool
     use_mcts::Bool
     params::MEJobParameters
 end
@@ -75,6 +76,8 @@ function MixedFidelityModelSelection.configurations(::Type{MEConfiguration};
                         grid_dims_xys=[10,30,50],
                         num_seeds=10,
                         mainbody_types=[BlobNode, EllipseNode, CircleNode],
+                        collect_betazero=false,
+                        use_mcts=false,
                         params::MEJobParameters)    
     configs = MEConfiguration[]
     for pomcpow_iters in pomcpow_iterations
@@ -82,7 +85,7 @@ function MixedFidelityModelSelection.configurations(::Type{MEConfiguration};
             for mainbody_type in mainbody_types
                 for seed in 1:num_seeds
                     grid_dims = (grid_dims_xy, grid_dims_xy, 1)
-                    config = MEConfiguration(seed, grid_dims, pomcpow_iters, mainbody_type, false, params)
+                    config = MEConfiguration(seed, grid_dims, pomcpow_iters, mainbody_type, collect_betazero, use_mcts, params)
                     push!(configs, config)
                 end
             end
@@ -157,8 +160,8 @@ function MixedFidelityModelSelection.initialize(config::Configuration)
                                check_repeat_obs=true,
                                check_repeat_act=true,
                                next_action=NextActionSampler(),
-                               k_action,
-                               alpha_action,
+                               k_action=k_action,
+                               alpha_action=alpha_action,
                                k_observation=2.0,
                                alpha_observation=0.1,
                                criterion=POMCPOW.MaxUCB(exploration_coefficient),
@@ -190,10 +193,10 @@ function MixedFidelityModelSelection.evaluate(trial::Trial; save_dir=nothing)
 
     Random.seed!(trial.config.seed)
     timing = @timed begin
-        trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false, verbose=false, collect_training_data=trial.config.use_mcts)
+        trial_results = run_trial(m, up, planner, s0, b0, save_dir=save_dir, display_figs=false, verbose=false, collect_training_data=trial.config.collect_betazero)
     end
 
-    if trial.config.use_mcts
+    if trial.config.collect_betazero
         data = trial_results[end]
         results = BetaZeroResults(config=trial.config,
                                   B=[d.b for d in data],

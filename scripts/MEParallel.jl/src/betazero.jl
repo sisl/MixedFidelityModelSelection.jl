@@ -1,9 +1,10 @@
-function sample_training_configurations(n::Int; grid_dims=(30,30,1), planning_iters=10, mainbody_type=BlobNode)
+function sample_training_configurations(n::Int; grid_dims=(30,30,1), planning_iters=10, mainbody_type=BlobNode, use_mcts=false)
     params = MEJobParameters(name="betazero")
     configs = MEConfiguration[]
+    collect_betazero = true
     for i in 1:n
         Random.seed!(i)
-        config = MEConfiguration(i, grid_dims, planning_iters, mainbody_type, true, params)
+        config = MEConfiguration(i, grid_dims, planning_iters, mainbody_type, collect_betazero, use_mcts, params)
         push!(configs, config)
     end
     return configs::Vector{<:Configuration}
