@@ -232,9 +232,6 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, par
         end
     end
     name = first(configs).params.name
-    combined_results_filename = joinpath(results_dir, "results_$name.bson")
-    @info "Saving results: $combined_results_filename"
-    @save combined_results_filename results
 
     if use_mcts
         X_train, Y_train = combine_betazero_training_data(results)
@@ -242,6 +239,10 @@ function reduce_results(configuration_fn::Function; results_dir=RESULTS_DIR, par
         betazero_results_filename = joinpath(results_dir, "betazero_training_$name.bson")
         @info "Saving results: $betazero_results_filename"
         @save betazero_results_filename data
+    else
+        combined_results_filename = joinpath(results_dir, "results_$name.bson")
+        @info "Saving results: $combined_results_filename"
+        @save combined_results_filename results
     end
 
     return results
