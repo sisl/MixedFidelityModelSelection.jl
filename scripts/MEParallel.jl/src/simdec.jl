@@ -1,10 +1,7 @@
 mutable struct SimDecTargets
-    accuracy::Real
     regret::Real            # R_best - R_actual
     runtime::Real           # minutes
     bias::Real              # 𝔼[predicted volume - truth]
-    variance::Real          # 𝔼[(predicted volume - 𝔼[predicted volume])²]
-    mse::Real               # mean squared error = bias² + var
     number_of_drills::Int   # number of bore holes drilled
     discounted_return::Real # discounted return of POMDP
 end
@@ -61,14 +58,14 @@ end
 
 
 function save_simdec_csv(results::Dict, results_dir; extraction_cost=150)
-    runtime_fn(res) = mean(map(t->t.time/60, res[:timing]))
+    runtimes_fn(res) = map(t->t.time/60, res[:timing])
     f(res) = res[:r_massive]
     f̂(res) = f(res) .+ last.(res[:rel_errors])
-    bias_fn(res) = mean(mean(f̂(res)) .- f(res))
-    variance_fn(res) = mean((f̂(res) .- mean(f̂(res))).^2)
-    mse_fn(res) = mean((f(res) - f̂(res)).^2)
-    bores_fn(res) = mean(res[:n_drills])
-    returns_fn(res) = mean(res[:discounted_return])
+    biases_fn(res) = mean(f̂(res)) .- f(res)
+    # variance_fn(res) = mean((f̂(res) .- mean(f̂(res))).^2)
+    # mse_fn(res) = mean((f(res) - f̂(res)).^2)
+    bores_fn(res) = res[:n_drills]
+    returns_fn(res) = res[:discounted_return]
 
     name = basename(results_dir)
     header = simdec_header()
@@ -81,16 +78,21 @@ function save_simdec_csv(results::Dict, results_dir; extraction_cost=150)
             planning_iterations = k[3]
             grid_dims = k[2][1]
             res = results[k]
-            accuracy = MixedFidelityModelSelection.accuracy(res; extraction_cost)
-            regret = mean(MixedFidelityModelSelection.regret(res; extraction_cost))
-            runtime = runtime_fn(res)
-            bias = bias_fn(res)
-            variance = variance_fn(res)
-            mse = mse_fn(res)
-            number_of_drills = bores_fn(res)
-            discounted_return = returns_fn(res)
-            row = join([mainbody_model, planning_iterations, grid_dims, accuracy, regret, runtime, bias, variance, mse, number_of_drills, discounted_return], ",")
-            println(f, row)
+            ℓ = length(res[:seed])
+            regrets = MixedFidelityModelSelection.regret(res; extraction_cost)
+            runtimes = runtimes_fn(res)
+            biases = biases_fn(res)
+            bores = bores_fn(res)
+            returns = returns_fn(res)
+            for i in 1:ℓ
+                regret = regrets[i]
+                runtime = runtimes[i]
+                bias = biases[i]
+                number_of_drills = bores[i]
+                discounted_return = returns[i]
+                row = join([mainbody_model, planning_iterations, grid_dims, regret, runtime, bias, number_of_drills, discounted_return], ",")
+                println(f, row)
+            end
         end
     end
     return csv_filename
