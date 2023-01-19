@@ -91,7 +91,8 @@ end
 # )
 
 # Load the data
-data = BSON.load(joinpath(@__DIR__, "..", "..", "POMDP-value-estimation", "betazero_training_betazero_pomcpow.bson"))[:data]
+# data = BSON.load(joinpath(@__DIR__, "..", "..", "POMDP-value-estimation", "betazero_training_betazero_pomcpow.bson"))[:data]
+data = BSON.load(joinpath(@__DIR__, "..", "..", "POMDP-value-estimation", "betazero_training_betazero_pomcpow_obs_1k.bson"))[:data]
 x_data, y_data = data[:X], data[:Y]
 
 # Remove channels 3,4 (skewness and kurtosis)
@@ -137,11 +138,12 @@ train_data = DataLoader((x_train, y_train), batchsize=512, shuffle=true)
 RUN_TUNING = false
 if RUN_TUNING
     tuning_results = Dict()
-    LRs = [0.1, 0.01, 0.001, 0.005, 0.0001]
+    LRs = [0.01, 0.001, 0.005, 0.0001]
     λs = [0, 0.01, 0.005, 0.001, 0.0001]
     LOSSES = [true, false]
 else
-    tuning_results = BSON.load(joinpath(@__DIR__, "tuning_results2.bson"))[:tuning_results]
+    # tuning_results = BSON.load(joinpath(@__DIR__, "tuning_results3.bson"))[:tuning_results]
+    tuning_results = Dict()
     LRs = [0.01]
     λs = [0.0001]
     LOSSES = [false]
@@ -243,4 +245,8 @@ for lr in LRs
             end
         end
     end
+end
+
+if RUN_TUNING
+    BSON.@save "tuning_results3.bson" tuning_results
 end
