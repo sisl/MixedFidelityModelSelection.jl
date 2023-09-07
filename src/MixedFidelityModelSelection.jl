@@ -84,4 +84,8 @@ export
     mismatch_std
 include("utils.jl")
 
+export
+    BeliefMDP
+include("belief_mdp.jl")
+
 end # module

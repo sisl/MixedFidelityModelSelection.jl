@@ -4,6 +4,7 @@ mutable struct SimDecTargets
     bias::Real              # 𝔼[predicted volume - truth]
     number_of_drills::Int   # number of bore holes drilled
     discounted_return::Real # discounted return of POMDP
+    accuracy::Real          # accuracy in the final [mine/abandon] decision
 end
 
 
@@ -79,6 +80,9 @@ function save_simdec_csv(results::Dict, results_dir; extraction_cost=150)
             grid_dims = k[2][1]
             res = results[k]
             ℓ = length(res[:seed])
+	    decisions = res[:last_action]
+	    true_decisions = MixedFidelityModelSelection.get_true_decisions(res)
+	    accuracies = decisions .== true_decisions
             regrets = MixedFidelityModelSelection.regret(res; extraction_cost)
             runtimes = runtimes_fn(res)
             biases = biases_fn(res)
@@ -90,7 +94,8 @@ function save_simdec_csv(results::Dict, results_dir; extraction_cost=150)
                 bias = biases[i]
                 number_of_drills = bores[i]
                 discounted_return = returns[i]
-                row = join([mainbody_model, planning_iterations, grid_dims, regret, runtime, bias, number_of_drills, discounted_return], ",")
+                accuracy = Int(accuracies[i])
+                row = join([mainbody_model, planning_iterations, grid_dims, regret, runtime, bias, number_of_drills, discounted_return, accuracy], ",")
                 println(f, row)
             end
         end
