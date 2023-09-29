@@ -22,7 +22,7 @@ function evaluate end
 function save end
 ```
 
-> To see an example of an implemented interface, see: [`interface_mineral_exploration.jl`](https://github.com/sisl/POMDPModelFidelityFramework.jl/blob/main/scripts/MEParallel.jl/src/interface_mineral_exploration.jl)
+To see an example of an implemented interface, see: [`interface_mineral_exploration.jl`](https://github.com/sisl/POMDPModelFidelityFramework.jl/blob/main/scripts/MEParallel.jl/src/interface_mineral_exploration.jl)
 
 ---
 
