@@ -1,4 +1,4 @@
-module MixedFidelityModelSelection
+module POMDPModelFidelityFramework
 
 import CairoMakie: Figure, Axis, density!, lines!, text!
 using ColorSchemes
@@ -81,7 +81,8 @@ export
     sample_massive,
     filltomatch!,
     mismatch_mean,
-    mismatch_std
+    mismatch_std,
+    bettersavefig
 include("utils.jl")
 
 export

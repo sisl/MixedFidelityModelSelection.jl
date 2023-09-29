@@ -27,8 +27,8 @@ begin
 	using Pkg
 	Pkg.develop(path="../../MineralExploration/")
 	using MineralExploration
-	Pkg.develop(path="../../MixedFidelityModelSelection/")
-	using MixedFidelityModelSelection
+	Pkg.develop(path="../../POMDPModelFidelityFramework/")
+	using POMDPModelFidelityFramework
 	
 	plot_ore_map = MineralExploration.plot_ore_map
 	plot_mass_map = MineralExploration.plot_mass_map

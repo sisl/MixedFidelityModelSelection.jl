@@ -49,10 +49,21 @@ end
 
 bettersavefig(filename; kwargs...) = bettersavefig(plot!(), filename; kwargs...)
 
-function bettersavefig(fig, filename; dpi=300)
+function bettersavefig(fig, filename; dpi=300, save_svg=false)
     filename_png = "$filename.png"
     filename_svg = "$filename.svg"
     savefig(fig, filename_svg)
-    run(`inkscape -f $filename_svg -e $filename_png -d $dpi`)
-    rm(filename_svg)
+    try
+        if Sys.iswindows()
+            run(`inkscape -f $filename_svg -e $filename_png -d $dpi`)
+        else
+            run(`inkscape $filename_svg -o $filename_png -d $dpi`)
+        end
+    catch err
+        @warn "If inkscape is not installed, try running: sudo apt install inkscape"
+        error(err)
+    end
+    if !save_svg
+        rm(filename_svg)
+    end
 end

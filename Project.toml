@@ -1,4 +1,4 @@
-name = "MixedFidelityModelSelection"
+name = "POMDPModelFidelityFramework"
 uuid = "9d78a0d1-c017-464c-9942-b61bfbc69bdb"
 authors = ["Robert Moss <rmoss92@gmail.com>"]
 version = "0.1.0"

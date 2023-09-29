@@ -11,7 +11,7 @@ begin
 	Pkg.develop(path="..//..//MineralExploration//")
 	using MineralExploration
 	Pkg.develop(path="..//")
-	using MixedFidelityModelSelection
+	using POMDPModelFidelityFramework
 	Pkg.develop(path="..//scripts//MEParallel.jl//")
 	using MEParallel
 	using BSON

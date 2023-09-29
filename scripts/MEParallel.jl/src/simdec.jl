@@ -81,9 +81,9 @@ function save_simdec_csv(results::Dict, results_dir; extraction_cost=150)
             res = results[k]
             ℓ = length(res[:seed])
 	    decisions = res[:last_action]
-	    true_decisions = MixedFidelityModelSelection.get_true_decisions(res)
+	    true_decisions = POMDPModelFidelityFramework.get_true_decisions(res)
 	    accuracies = decisions .== true_decisions
-            regrets = MixedFidelityModelSelection.regret(res; extraction_cost)
+            regrets = POMDPModelFidelityFramework.regret(res; extraction_cost)
             runtimes = runtimes_fn(res)
             biases = biases_fn(res)
             bores = bores_fn(res)

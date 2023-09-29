@@ -10,7 +10,7 @@ begin
 	using Pkg
 
 	Pkg.develop(path="..//")
-	using MixedFidelityModelSelection
+	using POMDPModelFidelityFramework
 	Pkg.develop(path="..//..//MineralExploration//")
 	using MineralExploration
 	Pkg.develop(path="..//scripts//MEParallel.jl//")

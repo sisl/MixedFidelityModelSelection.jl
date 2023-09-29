@@ -1,14 +1,8 @@
 ### A Pluto.jl notebook ###
-# v0.19.3
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
-
-# ╔═╡ 576da97a-0f4d-4e93-836a-77b2a1328722
-using LaTeXStrings
-
-# ╔═╡ 8405e36f-b6cf-481c-bb51-b67b67372c92
-using StatsPlots
 
 # ╔═╡ e4de635f-3564-4044-a62d-d7ee9a6ba95c
 begin
@@ -17,7 +11,7 @@ begin
 	Pkg.develop(path="..//..//MineralExploration//")
 	using MineralExploration
 	Pkg.develop(path="..//")
-	using MixedFidelityModelSelection
+	using POMDPModelFidelityFramework
 	Pkg.develop(path="..//scripts//MEParallel.jl//")
 	using MEParallel
 	using BSON
@@ -25,6 +19,9 @@ begin
 	using PlutoUI
 	using Plots; default(fontfamily="Computer Modern", framestyle=:box)
 end
+
+# ╔═╡ 576da97a-0f4d-4e93-836a-77b2a1328722
+using LaTeXStrings
 
 # ╔═╡ 2004db0f-c22c-4c66-b630-c1f8ce7e008d
 begin
@@ -63,6 +60,9 @@ worst_case(Z) = maximum(Z)
 CVaR(𝒞) = mean(𝒞)
 end
 
+# ╔═╡ 8405e36f-b6cf-481c-bb51-b67b67372c92
+using StatsPlots
+
 # ╔═╡ 41df3571-92bb-4520-b021-73dfd695d07d
 using DataFrames
 
@@ -100,7 +100,8 @@ md"""
 """
 
 # ╔═╡ ec1e38f4-6e90-4041-8a96-b1d829de193c
-results = BSON.load(raw"E:\SCERF\MEParallel.jl\results\results_fixed_bores_500.bson")[:results]
+# results = BSON.load(raw"E:\SCERF\MEParallel.jl\results\results_fixed_bores_500.bson")[:results]
+results = BSON.load(raw"/home/mossr/src/scerf/POMDPModelFidelityFramework/scripts/MEParallel.jl/results/simdec/results_simdec.bson")[:results]
 
 # ╔═╡ 9085cf37-0390-482f-94b4-40e46ce3d51e
 begin
@@ -118,6 +119,14 @@ begin
 	ptiming_ellipse = map(t->t.time, results50x50ellipse[:timing])
 	ptiming_circle = map(t->t.time, results50x50circle[:timing])
 end;
+
+# ╔═╡ f6abeb38-8096-47ee-8769-4e0166a7747c
+md"""
+# Sampled data heatmaps
+"""
+
+# ╔═╡ 7e2f559c-7f88-48a5-8045-e8daaf943bfd
+11
 
 # ╔═╡ 3085e225-59b9-4f0c-9586-5d82f307bf34
 md"""
@@ -701,7 +710,7 @@ begin
 end
 
 # ╔═╡ a3c97203-6bf6-4903-ae26-eb2ed326ed08
-MFMS = MixedFidelityModelSelection
+MFMS = POMDPModelFidelityFramework
 
 # ╔═╡ 55ef731c-fab2-4371-9eea-f6df5cb16393
 begin
@@ -1001,6 +1010,8 @@ results_regret
 # ╠═ec1e38f4-6e90-4041-8a96-b1d829de193c
 # ╠═9085cf37-0390-482f-94b4-40e46ce3d51e
 # ╠═13fc2600-3789-4fc7-a31e-357f35db4b37
+# ╟─f6abeb38-8096-47ee-8769-4e0166a7747c
+# ╠═7e2f559c-7f88-48a5-8045-e8daaf943bfd
 # ╟─3085e225-59b9-4f0c-9586-5d82f307bf34
 # ╠═b271a899-2831-456d-b5ad-5868a5890bab
 # ╠═f0f3efb8-e52d-4552-9675-762c4f3fedc4

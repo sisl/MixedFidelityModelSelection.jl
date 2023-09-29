@@ -100,7 +100,7 @@ md"""
 
 # ╔═╡ b8924cb0-8777-46a9-8185-0355fd54ee14
 directory_sandbox =
-"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\results\\data\\sensitivity_analysis_sweep_50x50_10k_blob\\"
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\POMDPModelFidelityFramework\\results\\data\\sensitivity_analysis_sweep_50x50_10k_blob\\"
 
 # ╔═╡ 7a257c15-edb3-421a-8473-76e96cbf631e
 sandbox_max = 22
@@ -127,7 +127,7 @@ md"""
 
 # ╔═╡ 11dbb167-7494-4ca7-b6be-f0b5ebaf9919
 directory_sandbox2 =
-"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\results\\data\\sensitivity_analysis_sweep\\"
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\POMDPModelFidelityFramework\\results\\data\\sensitivity_analysis_sweep\\"
 
 # ╔═╡ 2caffa80-9f99-43ed-8c94-4c97edc64b5c
 sandbox2_max = 22
@@ -154,7 +154,7 @@ md"""
 
 # ╔═╡ 058002fb-c411-4ce0-98be-38cd6bf2de17
 directory_wc =
-"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\notebooks\\worst_case_accuracy\\"
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\POMDPModelFidelityFramework\\notebooks\\worst_case_accuracy\\"
 
 # ╔═╡ 04fcbe2f-0777-4ba6-953f-c53432e643f6
 create_planning_gif_combined(directory_wc, 5;
@@ -167,7 +167,7 @@ md"""
 
 # ╔═╡ e3b6567b-300d-4821-8484-8d1329d91d02
 directory_bias =
-"C:\\Users\\mossr\\Code\\sisl\\CCS\\MixedFidelityModelSelection\\notebooks\\worst_case_bias\\"
+"C:\\Users\\mossr\\Code\\sisl\\CCS\\POMDPModelFidelityFramework\\notebooks\\worst_case_bias\\"
 
 # ╔═╡ 250d4bde-f965-4b92-894f-94c4ee2839d3
 bias_max = 6

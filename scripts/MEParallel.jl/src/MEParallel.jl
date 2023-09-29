@@ -11,7 +11,7 @@ using Statistics
 using Random
 using Distributions
 using MineralExploration
-using MixedFidelityModelSelection
+using POMDPModelFidelityFramework
 using MCTS
 using ProgressMeter
 using BSON
