@@ -3,7 +3,7 @@
 Model-fidelity analysis for POMDPs, with a case study for critical mineral exploration ([MineralExploration.jl](https://github.com/sisl/MineralExploration)).
 
 <p align="center">
-    <img src="./media/PMFF.jpg">
+    <img src="./media/PMFF_diagram.svg">
 </p>
 
 ## Interface
